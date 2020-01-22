@@ -1,0 +1,85 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.BusinessCard>
+@{
+
+    ViewBag.Title = "Tests";
+    var _cardHeight = 150;
+    var _cardWidth = 240;
+
+}
+
+    <div  class="row">
+        @foreach (var item in Model)
+        {
+
+            if (item.Cardshape == 1)
+            {
+                _cardHeight = 150;
+                _cardWidth = 240;
+            }
+            else if (item.Cardshape == 2)
+            {
+                _cardHeight = 240;
+                _cardWidth = 150;
+            }
+            else if (item.Cardshape == 3)
+            {
+                _cardHeight = 150;
+                _cardWidth = 150;
+
+            }
+            <div class="col-xl-6">
+				<div class="card border-top-info">
+					<div class="card-body">
+						<div class="row form-group">
+							<div class="col-xl-6">
+								<label>Name: <b>@item.Cardname</b></label><br>
+								<label>Created Date: <b>@item.Createddate</b></label>
+							</div>
+							<div class="col-xl-5">
+								<label>Category: <b>@item.CategoryName</b></label><br>
+								<label>
+									@if(item.Ispublished)
+									{
+								   <span> No of Users: <b>@item.UserCount </b></span>
+									}
+									else
+									{
+										<span>Not Published</span>
+									}
+								</label>
+							</div>
+							<div class="col-xl-1 text-right">
+								<div class="list-icons-item dropdown">
+									<a href="#" class="list-icons-item dropdown-toggle" data-toggle="dropdown"><i class="icon-menu7"></i></a>
+                                    <div class="dropdown-menu" trigger="click" :options="{placement: 'left'}">
+                                        <a href="/BusinessCards/EditCard?cardId=@item.CardId&PickORCloneImg=false" class="dropdown-item">Edit</a>
+                                        <a href="/BusinessCards/CloneCard?CardId=@item.CardId&ComingFrom=@item.IscameFrom&PickORCloneImg=true" class="dropdown-item"> Clone </a>
+                                        <a href="/BusinessCards/DeleteCardById?cardId=@item.CardId&ComingFrom=@item.IscameFrom" class="dropdown-item">Delete</a>
+                                        @if (!item.Ispublished && !item.IsDefault)
+                                        {
+                                            <a href="/BusinessCards/PublisheCardById?cardId=@item.CardId&ComingFrom=@item.IscameFrom" class="dropdown-item">Publish</a>
+                                        }
+                                       
+                                            <a href="/BusinessCards/CardsPreview?CardId=@item.CardId" class="dropdown-item">Preview</a>
+
+                                    </div>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="row">
+							<div class="col-xl-6">
+								<img src="~/uploadimgs/cards/@item.Cardfrontfile"  style="height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(item.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;" />
+							</div>
+							<div class="col-xl-6">
+								<img src="~/uploadimgs/cards/@item.Cardbackfile" style="height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(item.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;" />
+							</div>
+						</div>
+
+					</div>
+				</div>
+            </div>
+        }
+    </div>

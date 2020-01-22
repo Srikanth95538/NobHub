@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+<script>
+    function validateCardImages() {
+        if ($('#user_image_front').val() == "") {
+            alert('please select front image');
+            return false;
+
+        }
+        if ($('#user_image_back').val() == "") {
+            alert('please select back image');
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    function submitData() {
+
+        if (validateCardImages()) {
+            document.getElementById("frmUploadCards").submit();
+        }
+    }
+</script>
+@if (!string.IsNullOrEmpty(ViewBag.Status))
+{
+    <script type="text/javascript">
+        alert("@ViewBag.Status");
+    </script>
+}
+<div class="card bg-light mb-2">
+    <div class="card-body">
+        <h1 class="text-center">@ViewBag.Name</h1>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-4 mx-auto bg-light border pt-2 shadow-sm">
+        <form id="frmUploadCards" action="/BusinessCards/ImageUpload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Front Image:</label>
+                <input type="file" name="user_image_front" id="user_image_front" class="form-control-file border p-2" />
+            </div>
+            <div class="form-group">
+                <label>Back Image:</label>
+                <input type="file" name="user_image_back" id="user_image_back" class="form-control-file border p-2" />
+            </div>
+            <div class="form-group">
+                <label>Enter width in pixels</label>
+                <input type="text" id="txtcardWidth" name="txtcardWidth" value="600" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Enter height in pixels</label>
+                <input type="text" id="txtcardHeight" name="txtcardHeight" value="340" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Enter border radious in pixels</label>
+                <input type="text" id="txtcardborderradious" name="txtcardborderradious" value="0" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="button" value="Upload" class="btn btn-primary btn-block" onclick="submitData();" />
+            </div>
+        </form>
+    </div>
+</div>

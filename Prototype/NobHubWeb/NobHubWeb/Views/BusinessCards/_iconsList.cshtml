@@ -1,0 +1,186 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.cardicons>
+
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+    @Html.Hidden("hdniconId", 0)
+    <div class="row mb-1 mt-1">
+        <div class="col-lg-10"></div>
+        <div class="col-lg-2 text-right">
+            <button class="btn btn-primary btn-sm" onclick="AddIcon()">Add Icon</button>
+        </div>
+
+    </div>
+    <div class="card" style="background-color:#EEF3F3">
+        <table class="table datatable-basic">
+            <thead>
+                <tr>
+                    <th>Icon Name</th>
+                    <th>Icon Image</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.iconName</td>
+                        <td> <img class="img-fluid card-image" src="~/uploadimgs/icons/@item.iconFileName" alt=""></td>
+
+                        <td class="text-center">
+                            <div class="list-icons">
+                                <div class="dropdown">
+                                    <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                        <i class="icon-menu9"></i>
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a onclick="GetIconById(@item.iconId)" class="dropdown-item">Edit</a>
+                                        <a onclick="DeleteIcon(@item.iconId)" class="dropdown-item">delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+
+    <div class="modal" id="IconsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label>Icon Name</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="iconname" style="width:250px" type="text" />
+                        </div>
+                        <div class="col-lg-3"></div>
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-lg-3">
+                            <label>Image Icon</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="iconfile"  type="file" />
+                        </div>
+                        <div class="col-lg-3"></div>
+
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" onclick="createORUpdateicons()" class="btn btn-primary" data-dismiss="modal">Save</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+
+    <script>
+        function AddIcon() {
+            $("#iconname").val("");
+            $("#IconsModal").modal("show");
+            $("#hdniconId").val(0);
+        }
+        function GetIconById(IconId) {
+            
+            $("#hdniconId").val(IconId);
+            var formData = new FormData();
+            formData.append("iconId", IconId);
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/api/card/GetIconById",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    //  CardID = data.CategorieName;
+                    $("#IconsModal .modal-title").html("Edit Icon");
+                    $("#iconname").val(data.iconName);
+                    $("#IconsModal").modal("show");
+
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+        function createORUpdateicons() {
+            
+            $("#div_cardlist").html("");
+            
+            var formData = new FormData();
+            formData.append("iconId", $('#hdniconId').val());
+            formData.append("iconName", $('#iconname').val());
+            formData.append("iconfile", $('#iconfile')[0].files[0])
+            formData.append("iconFileName", $('#iconfile')[0].files[0].name)
+
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/BusinessCards/createORUpdateIcon",
+                data: formData,
+                dataType: 'html',
+                contentType: false,
+                processData: false,
+                success: function (data) {                  
+                    $("#divpartial").html(data);
+                    $("#IconsModal").modal("hide");
+
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        }
+
+        function DeleteIcon(IconId) {
+            
+            $("#div_cardlist").html("");
+            var dataToSend = {
+                iconId: IconId,
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch(window.location.origin + "/BusinessCards/DeleteIcon", {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text())
+                .then((responseJson) => {
+                    $("#divpartial").html(responseJson);
+
+                })
+                .catch(error => console.log(error))
+
+        }
+    </script>

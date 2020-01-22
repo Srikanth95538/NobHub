@@ -1,0 +1,288 @@
+﻿
+@model NobHub.BAL.Models.UsercardDetailelements
+@{
+    var _cardHeight = 180;
+    var _cardWidth = 300;
+    var MaincardHeight = 280;
+    var MaincardWidth = 494;
+    double top = 0;
+    double left = 0;
+    //var ispublished = Model.Ispublished;
+
+    if (Model.carddetails.Cardshape == 1)
+    {
+        _cardHeight = 180;
+        _cardWidth =300;
+
+
+    }
+    else if (Model.carddetails.Cardshape == 2)
+    {
+        _cardHeight = 180;
+        _cardWidth = 300;
+
+    }
+    else if (Model.carddetails.Cardshape == 3)
+    {
+        _cardHeight = 150;
+        _cardWidth = 150;
+
+    }
+    var AllBusinessCards = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.BusinessCard>;
+}
+<html>
+<head>
+    <style>
+        
+        .droptarget1 {
+            float: left;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            background-size: 100% 100% !important;
+            /*background-image: url("Images/card2.jpg");*/
+        }
+    </style>
+</head>
+</html>
+
+<div class="row mb-2 mt-2">
+    <div class="col-sm-1">
+        <label>User Name:</label>
+    </div>
+    <div class="col-lg-4">
+        <label ><b>@Model.carddetails.UserName</b></label>
+    </div> 
+</div>
+<div class="row" style="position:relative;height:@(_cardHeight + "px;")">
+
+   
+
+    <div class="droptarget1 mr-5" id="cardfront" style="position:absolute;height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.carddetails.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+        @foreach (var ele in Model.carddetails.Elements.Where(i => i.CardArea == "F"))
+        {
+            top = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * ele.PositionY;
+            left = (Convert.ToDouble(_cardWidth) / Convert.ToDouble(MaincardWidth)) * ele.PositionX;
+            <label style="position:absolute;width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(left+"px;") top:@(top+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight">
+                @ele.Cardelementtext
+            </label>
+
+            @if (ele.IconImageId > 0 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                var w = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+                var h = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(w + "px;");height:@(h + "px;") top:@(top +"px;") left:@(ele.IconImagePostiion == "L"?(left-w+"px;"):(left+ ele.Width+"px;"))"
+                     src="/uploadimgs/icons/@ele.Iconfile" />
+
+            }
+            @if (ele.ElementgroupId == 16 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(ele.Width+"px");height:@(ele.Height + "px;") top:@(ele.PositionY +"px;") left:@(ele.PositionX)"
+                     src="http://10.200.0.15:9095/uploadimgs/ProfilePictures/@ele.Cardelementtext" />
+            }
+        }
+
+
+    </div>
+    <div class="droptarget1" id="cardback" style="position:absolute;left:620px;height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.carddetails.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+        @foreach (var ele in Model.carddetails.Elements.Where(i => i.CardArea == "B"))
+        {
+            top = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * ele.PositionY;
+            left = (Convert.ToDouble(_cardWidth) / Convert.ToDouble(MaincardWidth)) * ele.PositionX;
+            <label style="position:absolute;width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(left+"px;") top:@(top+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight">
+                @ele.Cardelementtext
+            </label>
+
+            @if (ele.IconImageId > 0 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                var w = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+                var h = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(w + "px;");height:@(h + "px;") top:@(top +"px;") left:@(ele.IconImagePostiion == "L"?(left-w+"px;"):(left+ ele.Width+"px;"))"
+                     src="/uploadimgs/icons/@ele.Iconfile" />
+
+            }
+            @if (ele.ElementgroupId == 16 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(ele.Width+"px");height:@(ele.Height + "px;") top:@(ele.PositionY +"px;") left:@(ele.PositionX)"
+                     src="http://10.200.0.15:9095/uploadimgs/ProfilePictures/@ele.Cardelementtext" />
+            }
+        }
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="card mt-5">
+            <div class="card-body">
+                    <fieldset>
+                        <legend class="font-weight-semibold text-uppercase font-size-sm">Enter your information</legend>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Enter name:</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="name" class="form-control" placeholder="name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Enter Email:</label>
+                            <div class="col-lg-6">
+                                <input type="email" id="email" class="form-control" placeholder=" email">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Mobile:</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="mobile" class="form-control" placeholder="mobile">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Address:</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="address" class="form-control" placeholder="address">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Company name:</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="companyname" class="form-control" placeholder="company name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Title:</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="title" class="form-control" placeholder="title">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Department</label>
+                            <div class="col-lg-6">
+                                <input type="text" id="department" class="form-control" placeholder="department">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label" >Company Email:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="companyemail" placeholder="company email">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Website:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="website" placeholder="website">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Company Address:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="companyaddress" placeholder="Company Address">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Company Mobile:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="companymobile" placeholder="Company Mobile no">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Extension:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="extension" placeholder="extension">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Fax:</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="fax" placeholder="fax">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Logo:</label>
+                            <div class="col-lg-6">
+                                <input type="file" class="form-control" id="logo" placeholder="Logo">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label">Profeesion</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="profession" placeholder="department">
+                            </div>
+                        </div>
+                        
+                    </fieldset>
+
+                    <div class="text-right">
+                        <button type="submit" onclick="SubmitDummydetails(@Model.carddetails.CardId)" class="btn btn-primary">Submit form <i class="icon-paperplane ml-2"></i></button>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+<script>
+    function SubmitDummydetails(cardid) {
+        debugger
+
+        var formData = new FormData();
+        formData.append("Guid", cardid);
+        formData.append("Name", $('#name').val());
+        formData.append("Mobile", $('#mobile').val());
+        formData.append("Email", $("#email").val());
+        formData.append("Address", $("#address").val());
+        formData.append("Companyname", $('#companyname').val());
+        formData.append("Title", $('#title').val());
+        formData.append("Department", $('#department').val());
+        formData.append("Cemail", $('#companyemail').val());
+        formData.append("Website", $('#website').val());
+        formData.append("Caddress", $('#companyaddress').val());
+        formData.append("Cmobile", $('#companymobile').val());
+        formData.append("Exten", $('#extension').val());
+        formData.append("Fax", $("#fax").val());
+        formData.append("Logo", $("#logo").val());
+        formData.append("Profession", $('#profession').val());
+    
+
+
+
+
+        $.ajax({
+            type: "POST",
+            url: window.location.origin + "/BusinessCards/SubmitDummydetails",
+            data: formData,
+            dataType: 'html',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                alert("Saved Changes Successfully");
+
+            },
+            error: function (error) {
+
+            }
+        });
+    }
+     window.onload = function () {
+
+           var divcardfront = document.querySelector('#cardfront');
+
+                var ImageForfront = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.carddetails.Cardfrontfile")';
+
+                divcardfront.style.backgroundImage = ImageForfront;
+
+                var divcardback = document.querySelector('#cardback');
+                var ImageforBack = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.carddetails.Cardbackfile")';
+
+            divcardback.style.backgroundImage = ImageforBack;
+
+          
+    };
+
+</script>

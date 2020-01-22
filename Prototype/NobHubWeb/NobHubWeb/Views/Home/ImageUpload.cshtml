@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewData["Title"] = "ImageUpload";
+}
+<div class="row">
+    <div class="col-12 text-center">
+        <img src="@ViewBag.imgsrc" />
+    </div>    
+</div>
+<div class="row">
+    <div class="col-4 mx-auto bg-light border pt-3 mt-3 shadow-sm">
+        <form asp-action="UploadImage" method="post" enctype="multipart/form-data">
+            <div class="form-group border p-2">
+                <input type="file" name="user_image" id="user_image" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Upload" class="btn btn-primary btn-block" />
+            </div>
+        </form>
+    </div>
+</div>
+    
+

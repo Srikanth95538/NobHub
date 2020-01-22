@@ -1,0 +1,115 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.CardCategories>
+@*@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1 = "Business Cards";
+}*@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        .box li {
+            cursor: pointer;
+        }
+
+        #lookups .active {
+            background-color: #26A69A;
+        }
+    </style>
+    </head>
+<body>
+    @*<ul class="nav nav-pills">
+            <li class="nav-item"><a onclick="GetCategory()"  class="nav-link">Category</a></li>
+            <li class="nav-item"><a onclick="GetProfessions()" class="nav-link">Professions</a></li>
+            <li class="nav-item"><a onclick="GetAllIcons()" class="nav-link">Icons</a></li>
+        </ul>*@
+
+    <div class="box">
+        <div id="lookups">
+            <ul class="nav">
+                <li class="nav-item active">
+                    <a class="nav-link  " onclick="GetCategory()">Category</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link " onclick="GetProfessions()">Professions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " onclick="GetAllIcons()">Icons</a>
+                </li>
+
+            </ul>
+            </div>
+        </div>
+
+
+        <div id="divpartial">
+            @Html.Partial("_categoryList", Model)
+        </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        $('.box li').click(function () {
+            $(this).siblings('li').removeClass('active');
+            $(this).addClass('active');
+        });
+    });
+    function GetCategory() {
+        $("#divpartial").html("");
+        var formBody = [];
+        formBody = formBody.join("&");
+        fetch(window.location.origin + "/BusinessCards/GetCardCategories", {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {
+                $("#divpartial").html(responseJson);
+
+            })
+            .catch(error => console.log(error))
+
+    }
+    function GetProfessions() {
+        $("#divpartial").html("");
+        var formBody = [];
+        formBody = formBody.join("&");
+        fetch(window.location.origin + "/BusinessCards/GetProfessions", {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {
+                $("#divpartial").html(responseJson);
+
+            })
+            .catch(error => console.log(error))
+
+    }
+
+    function GetAllIcons() {
+        $("#divpartial").html("");
+        var formBody = [];
+        formBody = formBody.join("&");
+        fetch(window.location.origin + "/BusinessCards/GetAllIcons", {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {
+                $("#divpartial").html(responseJson);
+
+            })
+            .catch(error => console.log(error))
+
+    }
+</script>
+

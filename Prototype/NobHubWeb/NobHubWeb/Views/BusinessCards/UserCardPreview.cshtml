@@ -1,0 +1,180 @@
+﻿
+@model NobHub.BAL.Models.UsercardDetailelements
+@{
+    var _cardHeight = 180;
+    var _cardWidth = 300;
+    var MaincardHeight = 280;
+    var MaincardWidth = 494;
+    double top = 0;
+    double left = 0;
+    //var ispublished = Model.Ispublished;
+
+    if (Model.carddetails.Cardshape == 1)
+    {
+        _cardHeight = 180;
+        _cardWidth =300;
+
+
+    }
+    else if (Model.carddetails.Cardshape == 2)
+    {
+        _cardHeight = 180;
+        _cardWidth = 300;
+
+    }
+    else if (Model.carddetails.Cardshape == 3)
+    {
+        _cardHeight = 150;
+        _cardWidth = 150;
+
+    }
+    var AllBusinessCards = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.BusinessCard>;
+}
+<html>
+<head>
+    <style>
+        
+        .droptarget1 {
+            float: left;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            background-size: 100% 100% !important;
+            /*background-image: url("Images/card2.jpg");*/
+        }
+      
+    </style>
+</head>
+</html>
+<select id="businesscard"  style="width:200px;height:30px" class="mb-2" onchange="businesscardsonchange(businesscard.value)">
+    <option id="0" value="0">-- Select --</option>
+    @foreach (var item in AllBusinessCards)
+    {
+        <option id="@item.CardId" value="@item.CardId">@item.Cardname</option>
+    }
+</select>
+<div class="row mb-2 mt-2">
+    <div class="col-sm-1">
+        <label>User Name:</label>
+    </div>
+    <div class="col-lg-4">
+        <label ><b>@Model.carddetails.UserName</b></label>
+    </div>
+</div>
+<div class="row" style="position:relative;">
+
+   
+
+    <div class="droptarget1 mr-5" id="cardfront" style="position:absolute;height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.carddetails.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+        @foreach (var ele in Model.carddetails.Elements.Where(i => i.CardArea == "F"))
+        {
+            top = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * ele.PositionY;
+            left = (Convert.ToDouble(_cardWidth) / Convert.ToDouble(MaincardWidth)) * ele.PositionX;
+            <label style="position:absolute;width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(left+"px;") top:@(top+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight">
+                @ele.Cardelementtext
+            </label>
+
+            @if (ele.IconImageId > 0 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                var w = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+                var h = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(w + "px;");height:@(h + "px;") top:@(top +"px;") left:@(ele.IconImagePostiion == "L"?(left-w+"px;"):(left+ ele.Width+"px;"))"
+                     src="/uploadimgs/icons/@ele.Iconfile" />
+
+
+            }
+            @if (ele.ElementgroupId == 16 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(ele.Width+"px");height:@(ele.Height + "px;") top:@(ele.PositionY +"px;") left:@(ele.PositionX)"
+                     src="http://10.200.0.15:9095/uploadimgs/ProfilePictures/@ele.Cardelementtext" />
+            }
+        }
+
+
+    </div>
+    <div class="droptarget1" id="cardback" style="position:absolute;left:620px;height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.carddetails.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+        @foreach (var ele in Model.carddetails.Elements.Where(i => i.CardArea == "B"))
+        {
+            top = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * ele.PositionY;
+            left = (Convert.ToDouble(_cardWidth) / Convert.ToDouble(MaincardWidth)) * ele.PositionX;
+            <label 
+                   style="position:absolute;width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(left+"px;") top:@(top+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight">
+                @ele.Cardelementtext
+            </label>
+        
+            @if (ele.IconImageId > 0 && !string.IsNullOrEmpty(ele.Cardelementtext))
+            {
+
+                var w = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+                var h = (Convert.ToDouble(_cardHeight) / Convert.ToDouble(MaincardHeight)) * 20;
+
+                <img id="img-@ele.Cardlementtagname"
+                     style="position:absolute;width:@(w + "px;");height:@(h + "px;") top:@(top +"px;") left:@(ele.IconImagePostiion == "L"?(left-w+"px;"):(left+ ele.Width+"px;"))"
+                     src="/uploadimgs/icons/@ele.Iconfile" />
+
+            }
+        }
+
+    </div>
+</div>
+<script>
+     window.onload = function () {
+
+           var divcardfront = document.querySelector('#cardfront');
+
+                var ImageForfront = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.carddetails.Cardfrontfile")';
+
+                divcardfront.style.backgroundImage = ImageForfront;
+
+                var divcardback = document.querySelector('#cardback');
+                var ImageforBack = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.carddetails.Cardbackfile")';
+
+            divcardback.style.backgroundImage = ImageforBack;
+
+          
+    };
+
+    function businesscardsonchange(BCardid) {
+        var _card = {
+            CardId: BCardid,
+        };
+        var formBody = [];
+        for (var key in _card) {
+            var encodedKey = encodeURIComponent(key);
+            var encodedValue = encodeURIComponent(_card[key]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+
+        fetch('/api/Card/GetBusinessCardthemeById', {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {
+                var obj = JSON.parse(responseJson);
+                console.log(obj)
+                if (obj != null) {
+                 var divcardfront = document.querySelector('#cardfront');
+
+                    var ImageForfront = 'url(\'' + window.location.origin + '/uploadimgs/cards/' +obj.cardfrontfile+ '\')'
+
+                divcardfront.style.backgroundImage = ImageForfront;
+
+                    var divcardback = document.querySelector('#cardback');
+                    var ImageforBack = 'url(\'' + window.location.origin + '/uploadimgs/cards/' + obj.cardbackfile + '\')'
+
+                //var ImageforBack = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.carddetails.Cardbackfile")';
+
+            divcardback.style.backgroundImage = ImageforBack;
+                }
+            })
+            .catch(error => console.log(error))
+    }
+</script>

@@ -1,0 +1,1163 @@
+﻿
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        .droptarget1 {
+            float: left;
+            /*width: 600px;
+            height: 340px;*/
+            /*margin: 15px;*/
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            background-size: 100% 100% !important;
+            /*background-image: url("Images/card2.jpg");*/
+        }
+
+        .Celements {
+            position: absolute;
+            left: 5px;
+            top: 5px; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+            width: 200px;
+            /*background: rgba(255,255,255,0.66);*/
+            border: 2px solid rgba(0,0,0,0.5);
+            border-radius: 4px;
+            padding: 8px;
+            /*word-wrap: break-word;*/
+        }
+
+        .controls > input {
+            float: right;
+        }
+
+        .focusElement {
+            border-radius: 5px;
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Card:</label>
+                <select class="form-control" id="mycards" onchange="CardSelected(this);">
+                    <option value="">-- Select --</option>
+                    @*<option value="0">select card</option>
+                        <option value="Card1">Card1</option>
+                        <option value="Card2">Card2</option>
+                        <option value="Card3">Card3</option>*@
+                </select>
+            </div>
+        </div>
+        <div class="col-md-10" id="dvTable" style="visibility:hidden">
+            <div class="row">
+                <div class="col-md-3 form-group form-inline">
+                    <label class="col-form-label"></label>
+                    <input type="radio" name="myRadios" value="Horizontal" checked="checked" onclick="CardTypeRadiobuttonTapped(this);">Horizontal
+                    <input type="radio" name="myRadios" value="Vertical" onclick="CardTypeRadiobuttonTapped(this);" class="ml-2">Vertical
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group ">
+                        <label class="col-form-label">Border Radius:</label>
+                        <input type="text" id="borderradius" oninput="CommonOnchange(this)" class="form-control" />
+                    </div>
+                </div>
+                @*<div class="col-md-3">
+                    <div class="form-group text-right">
+                        <label>&nbsp;</label>
+                        <button id="applyDimBtn" onclick="applyDimensions(borderradius.value)" class="btn btn-info form-control">Apply Dimensions</button>
+                    </div>
+                </div>*@
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="SaveElementData();" class="btn btn-success form-control">Save Card Element</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="mydiv" style="visibility:hidden">
+
+        <div class="row">
+            @*<div class="col-md-2">
+                    <h6>Card Area:</h6>
+                </div>*@
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-3 form-group form-inline">
+                        <label class="col-form-label">Elements: &nbsp;</label>
+                        <select id="myElementGroup" class="form-control">
+                            <option id="0" value="Select">Select</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group form-inline">
+                        <label class="col-form-label">Card Area: &nbsp;&nbsp;</label>
+                        <input type="radio" name="card" id="cardfrontside" value="F" checked="checked">Front
+                        <input type="radio" name="card" id="cardbackside" value="B" class="ml-2">Back
+                    </div>
+                    <div class="col-md-2 ">
+                        <button onclick="createbuttonclick();" class="btn btn-primary form-control">Add Element</button>
+                        @*<button onclick="deletebuttonclick();" class="btn btn-danger form-control" style="visibility:hidden" id="deletebtn">Delete Element</button>*@
+                    </div>
+                    <div class="col-md-2 ">
+                        <button onclick="deletebuttonclick();" class="btn btn-danger form-control" style="visibility:hidden" id="deletebtn">Delete Element</button>
+                    </div>
+         </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="row mt-3 mb-3">
+        <div class="col-md-12">
+            <div style="position:relative;">
+                <div class="droptarget1" id="cardfront" style="left:100px;top:400px; visibility:hidden;display:inline-block; background-size: contain;background-repeat: no-repeat;"></div>
+                <div class="droptarget1" id="cardback" style="position:absolute; top:0px; left:620px; visibility:hidden; background-size: contain;background-repeat: no-repeat;"></div>
+            </div>
+        </div>
+    </div>
+    @*<div class="row mt-3 mb-3">
+            <div class="col-md-6">
+                <div class="droptarget1" id="cardfront" style="left:100px;top:400px; visibility:hidden;display:inline-block"></div>
+            </div>
+            <div class="col-md-6">
+                <div class="droptarget1" id="cardback" style="position:absolute; top:0px; left:620px; visibility:hidden"></div>
+            </div>
+        </div>*@
+
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="POITable" style="visibility:hidden;display:inline-block">
+                <table class="table table-bordered">
+                    @*<tr>
+                            <td>AttributeName</td>
+                            <td>AttributeValue</td>
+                        </tr>*@
+                    @*<tr>
+                            <td>Parent Width</td>
+                            <td><input size=25 type="text" id="txtparentwidth" /> px</td>
+                        </tr>
+                        <tr>
+                            <td>Parent Height</td>
+                            <td><input size=25 type="text" id="txtparentheight" /> px</td>
+                        </tr>*@
+                    <tr>
+                        <td>Element Name</td>
+                        <td><input size=25 type="text" id="txtcardelementname" readonly=true /></td>
+                        <td>Font Color</td>
+                        <td><input type="color" id="txtfontcolor" onchange="FontcolorClickEvent(this.value);" /></td>
+                        <td>Font Size</td>
+                        <td><input type="number" id="txtfontsize" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Font Weight</td>
+                        <td><input type="number" id="txtfontweight" onInput="CommonOnchange(this)" /></td>
+
+
+
+                    </tr>
+                    @*<tr>
+                            <td>Cardelement TagName</td>
+                            <td><input size=25 type="text" id="txtcardelementtagname" readonly=true /></td>
+                        </tr>*@
+                    <tr>
+                        <td>Position X</td>
+                        <td><input size=25 type="text" id="txtpositionx" readonly=true /></td>
+                        <td>Height</td>
+                        <td><input size=25 type="number" id="txtheight" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Icon Image</td>
+                        <td>
+                            <select id="txticonimagehaslink" onchange="GetImageById(txticonimagehaslink.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                            </select>
+                        </td>
+                        <td>Text Horizontal</td>
+                        <td>
+                            <select id="texthorizontal" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                                <option value="center">Center</option>
+                            </select>
+                        </td>
+
+
+
+                    </tr>
+                    <tr>
+                        <td>Position Y</td>
+                        <td><input size=25 type="text" id="txtpositiony" readonly=true /></td>
+                        <td>Width</td>
+                        <td><input size=25 type="number" id="txtwidth" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Icon Position</td>
+                        <td>
+                            <select id="txticonimageposition" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="L">Left</option>
+                                <option value="R">Right</option>
+                            </select>
+                        </td>
+                        <td>Text Vertical</td>
+                        <td>
+                            <select id="txtvertical" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="middle">Middle</option>
+                            </select>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Line Height</td>
+                        <td><input size=25 type="number" id="txtlineHeight" value="" onInput="CommonOnchange(this)" /> px</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </table>
+                @*<button id="btnupdatecarddimensions" onclick="UpdateCardDimensions(this)" class="btn btn-primary">Update</button>*@
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.js"></script>
+    <script>
+        var _url = 'http://10.200.0.15:9095';
+        //  _url = 'https://localhost:44331';
+        var _cardElementsFromTable = [];
+        var _cardElementsToTable = [];
+        var _difference = [];
+        var _ele;
+        var checkIteminfo;
+
+        var _dragged = "";
+
+        function RefreshCardArea(obj) {
+            var chk = document.getElementsByName("card");
+            for (var i = 0; i < chk.length; i++) {
+                chk[i].checked = false;
+                if ((obj.indexOf("_back_") > 1) && (chk[i].value == "B")) {
+                    chk[i].checked = true;
+                } else if ((obj.indexOf("_front_") > 1) && (chk[i].value == "F")) {
+                    chk[i].checked = true;
+                }
+
+            }
+        }
+        function drag_start(event) {
+            _dragged = event.target.id;
+            RefreshCardArea(_dragged);
+
+
+            var style = window.getComputedStyle(event.target, null);
+            offset_data = (parseInt(style.getPropertyValue("left"), 10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"), 10) - event.clientY);
+            event.dataTransfer.setData("text/plain", offset_data);
+        }
+        function drag_over(event) {
+
+            offset = event.dataTransfer.getData("text/plain").split
+            event.preventDefault();
+            return false;
+        }
+        function drop(event) {
+            offset = event.dataTransfer.getData("text/plain").split(',');
+            if (event.target.getAttribute("id") != null || event.target.getAttribute("id") != undefined) {
+
+                var ele = document.getElementsByName('card');
+                var _cardarea = "";
+                var pg = "";
+                for (i = 0; i < ele.length; i++) {
+                    if (ele[i].checked)
+                        _cardarea = ele[i].value;
+                }
+                if (_cardarea == "F") {
+                    pg = document.getElementById("cardfront");
+                }
+                else {
+                    pg = document.getElementById("cardback");
+                }
+                var offset = event.dataTransfer.getData("text/plain").split(',');
+
+                var dm = document.getElementById(_dragged);
+
+                if (event.clientX + parseInt(offset[0], 10) > 0 && event.clientY + parseInt(offset[1], 10) > 0
+                    &&
+                    event.clientX + parseInt(offset[0], 10) + parseInt(dm.style.width.replace('px', '')) <= parseInt(pg.style.width.replace('px', '')) &&
+                    event.clientY + parseInt(offset[1], 10) + parseInt(dm.style.height.replace('px', '')) <= parseInt(pg.style.height.replace('px', ''))
+                ) {
+
+                    dm.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
+                    dm.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
+
+                    var _hdnEle = document.getElementById('hdn-' + dm.getAttribute("id"));
+                    var _obj = JSON.parse(_hdnEle.value);
+
+                    var imgElements = document.getElementsByTagName('IMG');
+                    var imgEle = "";
+                    for (var i = 0; i < imgElements.length; i++) {
+                        if (imgElements[i].getAttribute('id') == dm.getAttribute("id")) {
+                            imgEle = imgElements[i];
+                            if (_obj.iconImagePostiion == "R") {
+                                imgEle.style.left = parseInt(dm.style.left.replace('px', '')) + parseInt(dm.style.width.replace('px', '')) + 5 + 'px';
+                                imgEle.style.top = parseInt(dm.style.top.replace('px', '')) + 'px';
+                                }
+                            else {
+                                imgEle.style.left = parseInt(dm.style.left.replace('px', '')) - 25 + 'px';
+                                imgEle.style.top = parseInt(dm.style.top.replace('px', '')) + 'px';
+
+                                }
+
+                            break;
+                        }
+                    }                  
+
+                    document.getElementById("txtpositionx").value = (event.clientX + parseInt(offset[0], 10));
+                    document.getElementById("txtpositiony").value = (event.clientY + parseInt(offset[1], 10)) ;
+
+                    updatehiddenfieldvalues(_dragged, event);
+                }
+                else {
+                    alert("Element out of boundary is not allowed");
+                }
+            }
+            else {
+                alert("Element  out of boundary is not allowed");
+            }
+
+            event.preventDefault();
+            _dragged = "";
+            return false;
+        }
+
+        document.body.addEventListener('dragover', drag_over, false);
+        document.body.addEventListener('drop', drop, false);
+
+        function updatehiddenfieldvalues(eventId, event) {
+            
+        var dm = document.getElementById("hdn-" + eventId);
+            var _values = JSON.parse(dm.value);
+            var offset = event.dataTransfer.getData("text/plain").split(',');
+            var obj = new Object();
+            obj["width"] = _values.width;
+            obj["cardlementtagname"] = eventId;
+            obj["cardElementgroup"] = _values.cardElementgroup;
+            obj["height"] = _values.height;
+            obj["positionX"] = (event.clientX + parseInt(offset[0], 10));
+            obj["positionY"] = (event.clientY + parseInt(offset[1], 10));
+            obj["fontSize"] = _values.fontSize;
+            obj["fontColor"] = _values.fontColor;
+            obj["fontWeight"] = _values.fontWeight;
+            obj["elementlineheight"] = _values.lineHeight;
+            obj["iconImageId"] = _values.iconImageId;
+            obj["iconImagePostiion"] = _values.iconImagePostiion;
+            dm.setAttribute("value", JSON.stringify(obj));
+        }
+
+        function arr_diff(a1, a2) {
+
+            var a = [], diff = [];
+
+            for (var i = 0; i < a1.length; i++) {
+                a[a1[i]] = true;
+            }
+
+            for (var i = 0; i < a2.length; i++) {
+                if (a[a2[i]]) {
+                    delete a[a2[i]];
+                } else {
+                    a[a2[i]] = true;
+                }
+            }
+
+            for (var k in a) {
+                diff.push(k);
+            }
+
+            return diff;
+        }
+    </script>
+    <script>
+
+        function CardSelected(obj) {
+
+            document.getElementById("POITable").style.visibility = "hidden";
+            document.getElementById("deletebtn").style.visibility = "hidden";
+
+            if (obj.selectedIndex > 0) {
+                document.getElementById("mydiv").style.visibility = "visible";
+                document.getElementById("dvTable").style.visibility = "visible";
+
+            }
+            else {
+                document.getElementById("mydiv").style.visibility = "hidden";
+
+            }
+
+            var _data = [];
+            var dataToSend = {
+                CardId: obj[obj.selectedIndex].value,
+
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch('api/card/GetActiveCarddetaillsById', {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.json())
+                .then((responseJson) => {
+                    _data.push(JSON.stringify(responseJson));
+                    var _obj = JSON.parse(_data);
+                    console.log(_obj);
+                    document.getElementById("cardfront").style.height = _obj[0].height + "px";
+                    document.getElementById("cardfront").style.width = _obj[0].width + "px";
+                    document.getElementById("cardback").style.height = _obj[0].height + "px";
+                    document.getElementById("cardback").style.width = _obj[0].width + "px";
+                    document.getElementById("cardfront").style.borderRadius = _obj[0].borderradious + "px";
+                    document.getElementById("cardback").style.borderRadius = _obj[0].borderradious + "px";
+                    checkIteminfo = document.getElementsByName("myRadios");
+                    if (_obj[0].height == 280 && _obj[0].width == 494) {
+                        checkIteminfo[0].checked = true;
+                    }
+                    else {
+                        checkIteminfo[1].checked = true;
+                    }
+                    document.getElementById("cardfront").style.visibility = "visible";
+                    document.getElementById("cardback").style.visibility = "visible";
+                    document.getElementById("cardfront").innerHTML = "";
+                    document.getElementById("cardback").innerHTML = "";
+                    document.getElementById("borderradius").value = _obj[0].borderradious;
+                    var divcardfront = document.querySelector('#cardfront');
+                    var ImageForfront = 'url("uploadimgs/cards/' + _obj[0].cardfrontfile.replace(/"/g, "") + ' ")';
+
+                    divcardfront.style.backgroundImage = ImageForfront;
+
+                    var divcardback = document.querySelector('#cardback');
+                    var ImageforBack = 'url("uploadimgs/cards/' + _obj[0].cardbackfile.replace(/"/g, "") + ' ")';
+
+                    divcardback.style.backgroundImage = ImageforBack;
+
+
+                  //  document.getElementById("myElementGroup").selectedIndex = "0";
+                    GetCardElementData(obj[obj.selectedIndex].value);
+                })
+                .catch(error => console.log(error))
+
+        }
+
+
+        // Save elemenet properties to database
+        function SaveElementData() {
+            _cardElementsToTable = [];
+            var obj = document.getElementById("cardfront");
+            SaveCardArea("F", obj);
+            obj = document.getElementById("cardback");
+            SaveCardArea("B", obj);
+            // _difference = _cardElementsFromTable.filter(x => !_cardElementsToTable.includes(x));
+
+            // var cardsdropdown = document.getElementById("mycards");
+            // var CardId = cardsdropdown.options[cardsdropdown.selectedIndex].value;
+            //DeleteCardElementsData(CardId, _difference);
+        }
+
+        function SaveCardArea(cardarea, obj) {
+            
+            var parentwidth = "0";
+            var parentheight = "0";
+
+            if (document.getElementsByName("myRadios")[0].checked == true) {
+                parentheight = "280";
+                parentwidth = "494";
+            }
+            else {
+                parentheight = "494";
+                parentwidth= "280";
+            }
+
+            for (var i = 0; i < obj.children.length; i++) {
+                if (obj.children[i].type == "hidden" && obj.children[i].tagName != "IMG") {
+                    var _eledetails = document.getElementById(obj.children[i].id);
+                    if (_eledetails != null) {
+                        cardElementTagname = obj.children[i].id.split("-");
+                        var divcardeledata = JSON.parse(_eledetails.value);
+                        var _color = divcardeledata.fontColor;
+                        var x = parseInt(divcardeledata.positionX);
+                        var y = parseInt(divcardeledata.positionY);
+                        var objwidth = divcardeledata.width;
+                        var objheight = divcardeledata.height;
+                        var borderRadius = document.getElementById("borderradius").value;
+                        var cardsdropdown = document.getElementById("mycards");
+                        var CardId = cardsdropdown.options[cardsdropdown.selectedIndex].value;
+                        var IconImageId = divcardeledata.iconImageId;
+                        var IconImagePosition = divcardeledata.iconImagePostiion;
+                        var fontsize = parseInt(divcardeledata.fontSize)
+
+                        var dataToSend = {
+                            Cardlementtagname: cardElementTagname[1],
+                            ElementgroupId: parseInt(divcardeledata.cardElementgroup),
+                            PositionX: x,
+                            PositionY: y,
+                            CardId: CardId,
+                            Height: objheight,
+                            Width: objwidth,
+                            FontColor: _color,
+                            FontSize: fontsize,
+                            FontWeight: divcardeledata.fontWeight,
+                            ParentWidth: parentwidth,
+                            ParentHeight: parentheight,
+                            CardArea: cardarea,
+                            Cardelementtext: '',
+                            Elementlineheight: divcardeledata.elementlineheight,
+                            IconImagePostiion: IconImagePosition,
+                            IconImageId: IconImageId,
+                            Borderradious: borderRadius
+                        };
+                        var formBody = [];
+                        for (var key in dataToSend) {
+                            var encodedKey = encodeURIComponent(key);
+                            var encodedValue = encodeURIComponent(dataToSend[key]);
+                            formBody.push(encodedKey + "=" + encodedValue);
+                        }
+                        formBody = formBody.join("&");
+                        fetch('/api/Card/InsertCardElementsData', {
+                            method: "POST",//Request Type
+                            body: formBody,//post body
+                            headers: {//Header Defination
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                            },
+                        }).then(response => response.json())
+                            .then((responseJson) => {
+                            })
+                            .catch(error => console.log(error))
+
+                    } //
+
+                }
+            }
+
+        }
+        // Move card to left or top
+        function moveCard() {
+            var pg = document.getElementById("cardfront");
+            pg.style.position = "absolute";
+            // var x = parseInt(pg.style.left.replace("px", "")) + 50;
+            var cur_left = parseFloat(pg.style.left);
+            pg.style.left = (cur_left + 250) + 'px';
+        }
+        //create element objects with in the card
+        function createbuttonclick() {
+
+            //var card = document.getElementById("mycards");
+            //if (card.selectedIndex < 1) {
+            //    alert("please select a card.");
+            //    return false;
+            //}
+            var obj = document.getElementById("myElementGroup");
+            createobject(obj);
+        }
+        //delete element objects in the card
+        function deletebuttonclick() {
+            
+            _ele = document.getElementsByClassName("focusElement");
+            if (_ele.length == 0) {
+                alert("Please select an element to remove");
+            } else {
+                // _ele[0].remove();
+                //for (var i = 0; i < _ele.length; i++) {
+                //    _ele[i].remove();
+                //}
+                //  _difference = _cardElementsFromTable.filter(x => !_cardElementsToTable.includes(x));
+
+                var cardsdropdown = document.getElementById("mycards");
+                var CardId = cardsdropdown.options[cardsdropdown.selectedIndex].value;
+                if (confirm("Are you sure want to delete?")) {
+                    var dataToSend = {
+                        Cardlementtagname: _ele[0].getAttribute("id"),
+                        CardId: CardId,
+
+                    };
+                    var formBody = [];
+                    for (var key in dataToSend) {
+                        var encodedKey = encodeURIComponent(key);
+                        var encodedValue = encodeURIComponent(dataToSend[key]);
+                        formBody.push(encodedKey + "=" + encodedValue);
+                    }
+                    formBody = formBody.join("&");
+                    fetch('/api/Card/DeleteCardElementsData', {
+                        method: "POST",//Request Type
+                        body: formBody,//post body
+                        headers: {//Header Defination
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                        },
+                    }).then(response => response.text)
+                        .then((responseJson) => {
+                            alert("Succesfully deleted");
+                            document.getElementById("POITable").style.visibility = "hidden";
+                            document.getElementById("deletebtn").style.visibility = "hidden";
+                            var removeimageElement = document.getElementsByTagName("IMG");
+                            for (var i = 0; i < removeimageElement.length; i++) {
+                                if (removeimageElement[i].getAttribute("id") == _ele[0].getAttribute("id")) {
+                                    removeimageElement[i].parentNode.removeChild(removeimageElement[i])
+                                }
+                            }
+                            document.getElementById("hdn-" + _ele[0].getAttribute("id")).parentNode.removeChild(document.getElementById("hdn-" + _ele[0].getAttribute("id")));
+                            _ele[0].remove();
+                        })
+                        .catch(error => console.log(error))
+
+                } else {
+                    // txt = "You pressed Cancel!";
+                }
+
+            }
+
+
+        }
+        //create element objects with in the card
+        function createobject(obj) {
+            var card = document.getElementById("mycards");
+            if (card.selectedIndex < 1) {
+                alert("please select a card.");
+                obj.selectedIndex = 0;
+                card = null;
+                return false;
+            }
+
+
+            var ele = document.getElementsByName('card');
+            var _cardarea;
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked)
+                    _cardarea = ele[i].value;
+            }
+
+            if (obj.selectedIndex > 0) {
+                //var _el = card.options[card.selectedIndex].text + "_" + _area.options[_area.selectedIndex].text + "_" + obj[obj.selectedIndex].value;
+
+                var _el = card.options[card.selectedIndex].text + "_" + _cardarea + "_" + obj[obj.selectedIndex].text;
+                //carea, elegroup, el-tag,empty
+                Generateobj(_cardarea, obj[obj.selectedIndex].text, _el, "");
+            }
+            else {
+                alert("please select an element group to create or delete");
+            }
+            card = null;
+            _area = null;
+        }
+        function generateUniqueTag(value) {
+            
+
+            var _hdnvalue = document.getElementById('hdn-' + value);
+            if (_hdnvalue == null) {
+                return value;
+            }
+            else {
+                for (var i = 1; i < 100; i++) {
+                    var _hdnvalue = document.getElementById('hdn-' + value + i);
+                    if (_hdnvalue == null) {
+
+                        return value + i;
+                        i = 101;
+
+                    }
+                    _hdnvalue = null;
+                }
+            }
+        }
+        function Generateobj(ea, eg, value, jsonstring) {
+            
+     
+            var divcard = "";
+            var ElementgroupId = document.getElementById("myElementGroup").value;
+            var _elementGroup = eg;
+            if (ea == "F") {
+                divcard = document.getElementById("cardfront");
+            }
+            else {
+                divcard = document.getElementById("cardback");
+            }
+
+            value = generateUniqueTag(value);
+
+            if (jsonstring == "") {
+                var y = document.createElement("LABEL");
+                y.setAttribute("Id", value);
+                y.setAttribute("type", "label");
+                y.setAttribute("draggable", "true");
+                y.style.width = "200px";
+                y.style.height = "44px";
+                y.style.color = "white";
+
+                y.setAttribute("Class", "Celements");
+                y.setAttribute("divcardId", divcard.getAttribute("id"));
+                y.setAttribute("onclick", "BindDimensionstotable(event, this);");
+                y.setAttribute('iconImageId', "0");
+                y.setAttribute('iconImagePostiion', "0");
+                var t = document.createTextNode(_elementGroup);
+                y.appendChild(t);
+                divcard.appendChild(y);
+                var dm = document.getElementById(value);
+                dm.addEventListener('dragstart', drag_start, false);
+
+                var input = document.createElement("input");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("id", "hdn-" + value);
+                var _style = window.getComputedStyle(dm, null);
+                var obj = new Object();
+                obj["width"] = dm.offsetWidth;
+                obj["cardlementtagname"] = value;
+                obj["cardElementgroup"] = ElementgroupId;
+                obj["height"] = dm.offsetHeight;
+                obj["positionX"] = dm.offsetLeft;
+                obj["positionY"] = dm.offsetTop;
+                obj["fontSize"] = "16";
+                obj["fontColor"] = "#ffffff";
+                obj["fontWeight"] = _style.fontWeight;
+                obj["lineHeight"] = "20";
+                obj["iconImageId"] = "0";
+                obj["iconImagePostiion"] = "0";
+               
+                input.setAttribute("value", JSON.stringify(obj));
+                //append to form element that you want .
+                divcard.appendChild(input);
+            }
+            else {
+                
+                var elementList = jsonstring;
+                var _obj = elementList.cardelElements;
+                var y = document.createElement("LABEL");
+                y.setAttribute("type", "label");
+                y.setAttribute("draggable", "true");
+                var y = document.createElement("LABEL");
+                y.setAttribute("Id", value);
+                y.setAttribute("type", "label");
+                y.setAttribute("divcardId", divcard.getAttribute("id"));
+                y.setAttribute("draggable", "true");
+                y.setAttribute("Class", "Celements");
+                y.setAttribute("onclick", "BindDimensionstotable(event, this);");
+                y.style.color = _obj.fontColor;
+                y.style.left = _obj.positionX + 'px';
+                y.style.top = _obj.positionY + 'px';
+                y.style.fontSize = _obj.fontSize + 'px';
+                y.style.position = "absolute";
+                y.style.width = _obj.width + 'px';
+                y.style.height = _obj.height + 'px';
+                y.style.padding = '8px';
+
+                if (_obj.elementlineheight != '') {
+                    y.style.lineHeight = _obj.elementlineheight + 'px';
+                }
+
+
+                var t = document.createTextNode(elementList.elementGroupName);
+                y.appendChild(t);
+                divcard.appendChild(y);
+                var dm = document.getElementById(value);
+                dm.addEventListener('dragstart', drag_start, false);
+
+                var input = document.createElement("input");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("id", "hdn-" + value);
+
+                var obj = new Object();
+                obj["width"] = _obj.width;
+                obj["cardlementtagname"] = value;
+                obj["cardElementgroup"] = _elementGroup;
+                obj["height"] = _obj.height;
+                obj["positionX"] = _obj.positionX;
+                obj["positionY"] = _obj.positionY;
+                obj["fontSize"] = _obj.fontSize;
+                obj["fontColor"] = _obj.color;
+                obj["fontWeight"] = _obj.fontWeight;
+                obj["lineHeight"] = _obj.lineHeight;
+                obj["iconImageId"] = _obj.iconImageId;
+                obj["iconImagePostiion"] = _obj.iconImagePostiion;
+                
+                input.setAttribute("value", JSON.stringify(obj));
+                //append to form element that you want .
+                divcard.appendChild(input);
+
+                if (elementList.cardiconsLookup != null) {
+                    var img = document.createElement("img");
+                    img.setAttribute("Id", value);
+                    img.style.left = _obj.positionX + 'px';
+                    img.style.top = _obj.positionY + 'px';
+                    img.style.width = "20px"
+                    img.style.height = "40px";
+                    if (elementList.cardelElements.iconImagePostiion == "R") {
+                        img.style.left = _obj.positionX + parseInt(_obj.width) + 5 + 'px';
+
+                    }
+                    else {
+                        img.style.left = _obj.positionX - 25 + 'px';
+                    }
+                    img.style.position = "absolute";
+                    img.src = "/uploadimgs/icons/" + elementList.cardiconsLookup.iconfile;
+                    divcard.appendChild(img);
+                }
+
+
+            }
+        }
+
+        function BindDimensionstotable(event, obj) {
+            document.getElementById("deletebtn").style.visibility = "visible";
+            //  document.getElementById("ElementsInfoTbl").style.visibility = "visible";
+            document.getElementById("POITable").style.visibility = "visible";
+            RefreshCardArea(event.target.id);
+            // remove focus of previous selections
+            _ele = document.getElementsByClassName("focusElement");
+            for (var i = 0; i < _ele.length; i++) {
+                _ele[i].classList.remove("focusElement");
+            }
+            document.getElementById(event.target.id).classList.add("focusElement");
+
+            var _hdnvalue = document.getElementById('hdn-' + event.target.id);
+            var _obj = JSON.parse(_hdnvalue.value);
+            if (_hdnvalue != null) {
+                document.getElementById("txtcardelementname").value = _obj.cardElementgroup;
+
+                document.getElementById("txtpositionx").value = _obj.positionX;
+                document.getElementById("txtpositiony").value = _obj.positionY;
+                document.getElementById("txtheight").value = _obj.height;
+                document.getElementById("txtwidth").value = _obj.width;
+                document.getElementById("txtfontcolor").value = _obj.fontColor;
+                document.getElementById("txtfontsize").value = parseInt(_obj.fontSize);
+                document.getElementById("txtfontweight").value = _obj.fontWeight;
+                document.getElementById("txtlineHeight").value = _obj.elementlineheight;
+                if (_obj.iconImagePostiion != "") {
+                    document.getElementById("txticonimageposition").value = _obj.iconImagePostiion;
+                }
+                else {
+                    document.getElementById("txticonimageposition").selectedIndex = 0;
+                }
+                if (_obj.iconImageId != "0") {
+                    document.getElementById("txticonimagehaslink").value = _obj.iconImageId;
+                }
+                else {
+                    document.getElementById("txticonimagehaslink").selectedIndex = 0;
+                }
+
+            }
+        }
+        //get crad elements data from database
+        function GetCardElementData(CardId) {
+            
+ 
+            var _data = [];
+            var dataToSend = {
+                CardId: CardId,
+
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch('/api/Card/GetCardElementData', {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.json())
+                .then((responseJson) => {
+                    _data.push(JSON.stringify(responseJson));
+                    var _obj = JSON.parse(_data);
+                    console.log("thanuja");
+                    console.log(_obj);
+                    // clean the loaded elements
+                    _cardElementsFromTable = [];
+                    for (var i = 0; i < _obj.length; i++) {
+                        var _eg = _obj[i].cardelElements.cardElementgroup;
+                        // load into array
+                        _cardElementsFromTable.push(_obj[i].cardelElements.cardlementtagname);
+                        var _elename = _obj[i].cardelElements.cardlementtagname;
+                        var _elearea = _obj[i].cardelElements.cardArea;
+
+
+                        Generateobj(_elearea, _eg, _elename, _obj[i]);
+
+                        document.getElementById("hdn-" + _elename).value = JSON.stringify(_obj[i].cardelElements);
+                    }
+                    _elename = null;
+                })
+
+                .catch(error => console.log(error))
+        }
+        function GetIconNames() {
+
+            var CardiconNameList = [];
+            var inconNamesDD = document.getElementById("txticonimagehaslink");
+            fetch('/api/card/GetIconNames')
+                .then(response => response.json())
+                .then((responseJson) => {
+                    CardiconNameList.push(JSON.stringify(responseJson));
+                    var _obj = JSON.parse(CardiconNameList);
+                    console.log(_obj);
+                    for (var i = 0; i < _obj.length; i++) {
+                        // POPULATE SELECT ELEMENT WITH JSON.
+                        inconNamesDD.innerHTML = inconNamesDD.innerHTML +
+                            '<option value="' + _obj[i]['cardiconid'] + '">' + _obj[i]['iconname'] + '</option>';
+                    }
+
+                })
+                .catch(error => console.log(error)) //to catch the errors if any
+        }
+
+               function SaveDimensions(id, height, width, bradius) {
+
+
+
+            var dataToSend = {
+                cardId: id,
+                height: height,
+                width: width,
+                Borderradious: bradius
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch('/api/Card/UpdateCardDimensions', {
+                //fetch('https://localhost:44331/api/Card/UpdateCardDimensions', {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text)
+                .then((responseJson) => {
+                    alert("Card dimensions Updated Succesfully");
+                })
+
+                .catch(error => console.log(error))
+
+
+
+        }
+        function GetImageById(imageId) {
+
+            var img = document.createElement("img");
+            var _data = [];
+            var dataToSend = {
+                cardiconid: imageId,
+
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch('/api/card/GetIconNameById', {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.json())
+                .then((responseJson) => {
+                    _data.push(JSON.stringify(responseJson));
+                    var _obj = JSON.parse(_data);
+                    // _ele = document.getElementsByClassName("focusElement");
+                    _ele[0].setAttribute("iconimageid", imageId);
+
+
+                    var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+                    var _hdnobj = JSON.parse(_hdnEle.value);
+                    _hdnobj.iconImageId = imageId;
+                    _hdnEle.value = JSON.stringify(_hdnobj);
+
+                    img.setAttribute("Id", _ele[0].getAttribute("id"));
+                    img.style.top = parseInt(_ele[0].style.top.replace('px', '')) + 'px';
+                    img.style.width = "20px"
+                    img.style.height = "40px";
+                    if (document.getElementById("txticonimageposition").value == "R") {
+                        img.style.left = parseInt(_ele[0].style.left.replace('px', '')) + parseInt(_ele[0].style.width.replace('px', '')) + 5 + 'px';
+                    }
+                    else {
+                        img.style.left = parseInt(_ele[0].style.left.replace('px', '')) - 25 + 'px';
+
+                    }
+
+                    var removeimageElement = document.getElementsByTagName("IMG");
+                    for (var i = 0; i < removeimageElement.length; i++)
+                    {
+                        if (removeimageElement[i].getAttribute("id") == _ele[0].getAttribute("id"))
+                        {
+                            removeimageElement[i].parentNode.removeChild(removeimageElement[i]);
+                        }
+                    }
+                    img.style.position = "absolute";
+                    img.src = "/uploadimgs/icons/" + _obj.iconfile;
+                    if (_ele[0].getAttribute("divcardid") == "cardfront")
+                        document.getElementById("cardfront").appendChild(img);
+                    else
+                        document.getElementById("cardback").appendChild(img);
+
+
+
+                })
+                .catch(error => console.log(error))
+        }
+        function iconposition(iconposition) {
+         
+            var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+            var _obj = JSON.parse(_hdnEle.value);
+            _obj.iconImagePostiion = iconposition;
+            _hdnEle.value = JSON.stringify(_obj);
+
+            var imgElements = document.getElementsByTagName('IMG');
+            var imgEle = "";
+            for (var i = 0; i < imgElements.length; i++) {
+                if (imgElements[i].getAttribute('id') == _ele[0].getAttribute("id")) {
+                    imgEle = imgElements[i];
+                    if (iconposition == "L")
+                        imgEle.style.left = parseInt(_ele[0].style.left.replace('px', '')) - 25 + 'px';
+                    else
+                        imgEle.style.left = parseInt(_ele[0].style.left.replace('px', '')) + parseInt(_ele[0].style.width.replace('px', '')) + 5 + 'px';
+
+                    break;
+                }
+            }
+        }
+        function CommonOnchange(event) {
+
+            if (_ele != undefined) {
+                var focusEle = document.getElementById(_ele[0].getAttribute("id"));
+                var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+                var _obj = JSON.parse(_hdnEle.value);
+            }
+            switch (event.id) {
+                case 'txtheight':
+
+                    _obj.height = document.getElementById("txtheight").value;
+                    focusEle.style.height = _obj.height + "px";
+                    break;
+                case 'txtwidth':
+                    _obj.width = document.getElementById("txtwidth").value;
+                    focusEle.style.width = _obj.width + "px";
+                case 'txtfontsize':
+                    _obj.fontSize = document.getElementById("txtfontsize").value;
+                    focusEle.style.fontSize = _obj.fontSize + "px";
+                    break;
+                case 'txtfontweight':
+                    _obj.fontWeight = document.getElementById("txtfontweight").value;
+                    focusEle.style.fontWeight = _obj.fontWeight;
+                    break;
+                case 'txthorizontal':
+                    // document.getElementById(_ele[0].getAttribute("id")).style.height = document.getElementById("txtheight").value + "px";
+                    break;
+                case 'txtvertical':
+                    //  document.getElementById(_ele[0].getAttribute("id")).style.height = document.getElementById("txtheight").value + "px";
+                    break;
+                case 'txtlineHeight':
+                    _obj.elementlineheight = document.getElementById("txtlineHeight").value;
+                    focusEle.style.lineHeight = _obj.elementlineheight + 'px';
+                    break;
+                case 'borderradius':
+                    document.getElementById("cardfront").style.borderRadius = parseInt(document.getElementById("borderradius").value)+ "px";
+                    document.getElementById("cardback").style.borderRadius = parseInt(document.getElementById("borderradius").value)+ "px";
+                default:
+                    //Console.WriteLine("Invalid grade");
+                    break;
+            }
+            _hdnEle.value = JSON.stringify(_obj);
+        }
+        function FontcolorClickEvent(value) {
+
+            var focusEle = document.getElementById(_ele[0].getAttribute("id"));
+            var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+            var _obj = JSON.parse(_hdnEle.value);
+            _obj.fontColor = value;
+            focusEle.style.color = value;
+            _hdnEle.value = JSON.stringify(_obj);
+
+        }
+        function CardTypeRadiobuttonTapped(myRadio) {
+
+
+            if (myRadio.value == "Horizontal") {
+                document.getElementById("cardfront").style.height = "280px";
+                document.getElementById("cardfront").style.width = "494px";
+                document.getElementById("cardback").style.height = "280px";
+                document.getElementById("cardback").style.width = "494px";
+            }
+            else {
+                document.getElementById("cardfront").style.height = "494px";
+                document.getElementById("cardfront").style.width = "280px";
+                document.getElementById("cardback").style.height = "494px";
+                document.getElementById("cardback").style.width = "280px";
+            }
+
+
+        }
+        window.onload = function () {
+            // GetCardElementData();
+            GetIconNames();
+            var _data = [];
+            var _cardlist = [];
+            var mycardsDD = document.getElementById("mycards");
+            var _select = document.getElementById("myElementGroup");
+            try {
+                fetch('/api/Card/GetCardElementGroups')
+                    .then(response => response.json())
+                    .then((responseJson) => {
+                        _data.push(JSON.stringify(responseJson));
+                        var _obj = JSON.parse(_data);
+                       
+                        this.console.log("GetCardElementGroups"+_obj);
+                        for (var i = 0; i < _obj.length; i++) {
+                            var option = document.createElement("option");
+                            option.value = _obj[i].cardelementId;
+                            option.text = _obj[i].cardelementname;
+                            _select.appendChild(option);
+                        }
+
+                    })
+                    .catch(error => console.log(error)) //to catch the errors if any
+            }
+            catch (e) {
+
+            }
+
+            //GetActiveCards
+            fetch('/api/card/GetActiveCards')
+                .then(response => response.json())
+                .then((responseJson) => {
+                    _cardlist.push(JSON.stringify(responseJson));
+                    var _obj = JSON.parse(_cardlist);
+                    for (var i = 0; i < _obj.length; i++) {
+                        // POPULATE SELECT ELEMENT WITH JSON.
+                        mycardsDD.innerHTML = mycardsDD.innerHTML +
+                            '<option value="' + _obj[i]['cardId'] + '">' + _obj[i]['cardname'] + '</option>';
+                    }
+
+                })
+                .catch(error => console.log(error)) //to catch the errors if any
+        };
+
+    </script>
+
+</body>
+</html>
+

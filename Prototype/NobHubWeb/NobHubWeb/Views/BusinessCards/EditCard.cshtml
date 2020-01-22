@@ -1,0 +1,1025 @@
+﻿@model NobHub.BAL.Models.BusinessCard
+@{
+    var _cardHeight = 494;
+    var _cardWidth = 280;
+    var ispublished = Model.Ispublished;
+
+    if (Model.Cardshape == 1)
+    {
+        _cardHeight = 280;
+        _cardWidth = 494;
+        Model.BorderradiusDisable = false;
+    }
+    else if (Model.Cardshape == 2)
+    {
+        _cardHeight = 494;
+        _cardWidth = 280;
+        Model.BorderradiusDisable = false;
+    }
+    else if(Model.Cardshape == 3)
+    {
+        _cardHeight = 290;
+        _cardWidth = 290;
+        Model.BorderradiusDisable = true;
+
+
+    }
+
+    ViewBag.Title1 = "Business Cards";
+
+    var AllElementTypes = ViewBag.AllElements as IEnumerable<NobHub.BAL.Models.Lookup>;
+    var AllIcons = ViewBag.AllIcons as IEnumerable<NobHub.BAL.Models.ElementIconsLookup>;
+    var AllCardCategories = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.CardCategories>;
+}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        .droptarget1 {
+            float: left;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            background-size: 100% 100% !important;
+            /*background-image: url("Images/card2.jpg");*/
+        }
+
+        .Celements {
+            position: absolute;
+            left: 5px;
+            top: 5px; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+            width: 200px;
+            /*background: rgba(255,255,255,0.66);*/
+            border: 2px solid rgba(0,0,0,0.5);
+            border-radius: 4px;
+            padding: 8px;
+            /*word-wrap: break-word;*/
+        }
+
+        .controls > input {
+            float: right;
+        }
+
+        .focusElement {
+            border-radius: 5px;
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    @Html.Hidden("hdnCardId", Model.CardId)
+    @Html.Hidden("hdnIspublished", Model.Ispublished)
+    @Html.Hidden("hdnIsDefaultCard", Model.IsDefault)
+    @Html.Hidden("hdnFrontFile", Model.Cardfrontfile)
+    @Html.Hidden("hdnBackFile", Model.Cardbackfile)
+    @Html.Hidden("hdnCategory", Model.Category)
+    @Html.Hidden("hdnpickorCloneImg",Model.PickORCloneImg)
+
+    <div class="row mb-3">
+
+        <div class="col-lg-2">
+            <label class="col-form-label">Card Name</label>
+            <input type="text" id="cardName" class="form-control" value="@Model.Cardname" />
+        </div>
+
+        <div class="col-lg-3">
+
+            <label class="col-form-label"> Card Type </label>
+            <div class="form-control border-0 pl-0 bg-transparent">
+                <input type="radio" name="myRadios" value="1" @(Model.Cardshape == 1 ? "checked" : "") onclick="CardTypeRadiobuttonTapped(this);">Horizontal
+                <input type="radio" name="myRadios" value="2" @(Model.Cardshape == 2 ? "checked" : "") onclick="CardTypeRadiobuttonTapped(this);" class="ml-2">Vertical
+                <input type="radio" name="myRadios" value="3" @(Model.Cardshape == 3 ? "checked" : "") onclick="CardTypeRadiobuttonTapped(this);" class="ml-2">Circle
+            </div>
+        </div>
+        <div class="col-lg-3 form-group">
+            <label class="col-form-label">Card Categories: &nbsp;</label>
+
+            <select id="CardCategories" class="form-control">
+                <option value="0">Select</option>
+                @foreach (var eleType in AllCardCategories)
+                {
+                    <option value="@eleType.categorieID">@eleType.categorieName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-lg-2" hidden="@Model.BorderradiusDisable">
+            <div class="form-group" id="borderRadiusCls">
+                <label class="col-form-label">Border Radius</label>
+                <br />
+                <input type="text" id="borderradius" onInput="CommonOnchange(this)" class="form-control" value="@Model.Borderradius" />
+            </div>
+        </div>
+
+        <div class="col-lg-2">
+            <div class="form-group">
+                <label class="col-form-label">&nbsp;</label>
+                <button onclick="SubmitButtonOnclick();" class="btn btn-primary btn-sm">Save Card Element</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="mydiv">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-3 form-group form-inline">
+                        <label class="col-form-label">Elements: &nbsp;</label>
+
+                        <select id="myElementGroup" class="form-control">
+                            <option value="Select">Select</option>
+                            @foreach (var eleType in AllElementTypes)
+                            {
+                                <option value="@eleType.value">@eleType.text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group form-inline">
+                        <label class="col-form-label">Card Area: &nbsp;&nbsp;</label>
+                        <input type="radio" name="card" id="cardfrontside" value="F" checked="checked">Front
+                        <input type="radio" name="card" id="cardbackside" value="B" class="ml-2">Back
+                    </div>
+                    <div class="col-md-2 ">
+                        <button onclick="createbuttonclick();" class="btn btn-primary form-control">Add Element</button>
+                    </div>
+                    <div class="col-md-2 ">
+                        <button onclick="deletebuttonclick();" class="btn btn-danger form-control" style="visibility:hidden" id="deletebtn">Delete Element</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="row mt-3 mb-3">
+        <div class="col-md-12">
+
+            <div style="position:relative;">
+
+                <div class="droptarget1" id="cardfront" style="height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+                    @foreach (var ele in Model.Elements.Where(i => i.CardArea == "F"))
+                    {
+                        <label class="Celements" draggable="true" id="@ele.Cardlementtagname" onclick="BindDimensionstotable(event, this)"
+                               style="position:absolute; width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(ele.PositionX+"px;") top:@(ele.PositionY+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight; padding:8px;lineHeight:@(ele.Elementlineheight+"px;")">
+                            @ele.ElementTypeName
+                        </label>
+                        <input type="hidden" id="hdn-@ele.Cardlementtagname"
+                               value='{"Id":@ele.Id,"CardArea":"@ele.CardArea","PositionX":@ele.PositionX,"PositionY":@ele.PositionY,
+                               "Width":@ele.Width, "Height":@ele.Height,"ElementgroupId":@ele.ElementgroupId,
+                               "Cardlementtagname":"@ele.Cardlementtagname","FontSize":@ele.FontSize,"FontColor":"@ele.FontColor",
+                               "FontWeight":"@ele.FontWeight", "elementlineHeight":"@ele.Elementlineheight",
+                               "iconImageId":"@ele.IconImageId","iconImagePostiion":"@ele.IconImagePostiion",
+                               "ElementTypeName":"@ele.ElementTypeName"}' />
+
+                        @if (ele.IconImageId > 0)
+                        {
+                            <img id="img-@ele.Cardlementtagname"
+                                 style="position:absolute;width:20px;height:@(ele.Height+"px;") top:@(ele.PositionY +"px;") left:@(ele.IconImagePostiion == "L"?(ele.PositionX-25+"px;"):(ele.PositionX + ele.Width+5+"px;"))"
+                                 src="/uploadimgs/icons/@ele.Iconfile" />
+
+                        }
+                    }
+                </div>
+
+            </div>
+            <div class="droptarget1" id="cardback" style="left:620px;position:absolute;height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(Model.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;">
+                @foreach (var ele in Model.Elements.Where(i => i.CardArea == "B"))
+                {
+                    <label class="Celements" draggable="true" id="@ele.Cardlementtagname" onclick="BindDimensionstotable(event, this)"
+                           style="position:absolute; width:@(ele.Width + "px;") height:@(ele.Height + "px;") left:@(ele.PositionX+"px;") top:@(ele.PositionY+"px;") color:@ele.FontColor;font-size:@(ele.FontSize+"px;") font-weight:@ele.FontWeight; padding:8px;lineHeight:@(ele.Elementlineheight+"px;")">
+                        @ele.ElementTypeName
+                    </label>
+
+                    <input type="hidden" id="hdn-@ele.Cardlementtagname"
+                           value='{"Id":@ele.Id,"CardArea":"@ele.CardArea","PositionX":@ele.PositionX,"PositionY":@ele.PositionY,
+                               "Width":@ele.Width, "Height":@ele.Height,"ElementgroupId":@ele.ElementgroupId,
+                               "Cardlementtagname":"@ele.Cardlementtagname","FontSize":@ele.FontSize,"FontColor":"@ele.FontColor",
+                               "FontWeight":"@ele.FontWeight", "elementlineHeight":"@ele.Elementlineheight",
+                               "iconImageId":"@ele.IconImageId","iconImagePostiion":"@ele.IconImagePostiion",
+                               "ElementTypeName":"@ele.ElementTypeName"}' />
+
+                    @if (ele.IconImageId > 0)
+                    {
+                        <img id="img-@ele.Cardlementtagname"
+                             style="position:absolute;width:20px;height:@(ele.Height+"px;") top:@(ele.PositionY +"px;") left:@(ele.IconImagePostiion == "L"?(ele.PositionX-25+"px;"):(ele.PositionX + ele.Width+5+"px;"))"
+                             src="/uploadimgs/icons/@ele.Iconfile" />
+
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-6">
+            <input type="file" id="frontFile" name="image_front" onchange="fileOnChange(this)" />
+        </div>
+        <div class="col-md-6">
+            <input type="file" class="ml-4 pl-2" id="backFile" name="image_back" onchange="fileOnChange(this)" />
+        </div>
+
+    </div>
+
+
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="POITable" style="visibility:hidden;">
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Element Name</td>
+                        <td><input size=25 type="text" id="txtcardelementname" readonly=true /></td>
+                        <td>Font Color</td>
+                        <td><input type="color" id="txtfontcolor" onchange="FontcolorClickEvent(this.value);" /></td>
+                        <td>Font Size</td>
+                        <td><input type="number" id="txtfontsize" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Font Weight</td>
+                        <td><input type="number" id="txtfontweight" onInput="CommonOnchange(this)" /></td>
+                    </tr>
+
+                    <tr>
+                        <td>Position X</td>
+                        <td><input size=25 type="text" id="txtpositionx" readonly=true /></td>
+                        <td>Height</td>
+                        <td><input size=25 type="number" id="txtheight" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Icon Image</td>
+                        <td>
+                            <select id="txticonimagehaslink" onchange="GetImageById(txticonimagehaslink.value)" style="width: 200px;">
+                                <option id="0" value="0">-- Select --</option>
+                                @foreach (var icon in AllIcons)
+                                {
+                                    <option id="@icon.IconFile" value="@icon.Id">@icon.IconName</option>
+                                }
+                            </select>
+                        </td>
+                        <td>Text Horizontal</td>
+                        <td>
+                            <select id="texthorizontal" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                                <option value="center">Center</option>
+                            </select>
+                        </td>
+
+
+
+                    </tr>
+                    <tr>
+                        <td>Position Y</td>
+                        <td><input size=25 type="text" id="txtpositiony" readonly=true /></td>
+                        <td>Width</td>
+                        <td><input size=25 type="number" id="txtwidth" onInput="CommonOnchange(this)" /> px</td>
+                        <td>Icon Position</td>
+                        <td>
+                            <select id="txticonimageposition" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="L">Left</option>
+                                <option value="R">Right</option>
+                            </select>
+                        </td>
+                        <td>Text Vertical</td>
+                        <td>
+                            <select id="txtvertical" onchange="iconposition(txticonimageposition.value)" style="width: 200px;">
+                                <option value="0">-- Select --</option>
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="middle">Middle</option>
+                            </select>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Line Height</td>
+                        <td><input size=25 type="number" id="txtlineHeight" value="" onInput="CommonOnchange(this)" /> px</td>
+                        <td style="visibility:hidden" id="STtext">Static Text</td>
+                        <td style="visibility:hidden" id="STinput"><input type="text" id="staticlabel" /></td>
+                        <td style="visibility:hidden" id="SItext">upload Static Image</td>
+                        <td style="visibility:hidden" id="SIfile"><input type="file" id="staticimage" /></td>
+                    </tr>
+                </table>
+                @*<button id="btnupdatecarddimensions" onclick="UpdateCardDimensions(this)" class="btn btn-primary">Update</button>*@
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.js"></script>
+    <script>
+        var _difference = [];
+        var _ele;
+        var _dragged = "";
+        var CardID;
+        document.body.addEventListener('dragover', drag_over, false);
+        document.body.addEventListener('drop', drop, false);
+
+        function RefreshCardArea(obj) {
+            var chk = document.getElementsByName("card");
+            for (var i = 0; i < chk.length; i++) {
+                chk[i].checked = false;
+                if ((obj.indexOf("B_") > 1) && (chk[i].value == "B")) {
+                    chk[i].checked = true;
+                } else if ((obj.indexOf("F_") > 1) && (chk[i].value == "F")) {
+                    chk[i].checked = true;
+                }
+            }
+        }
+        function drag_start(event) {
+            _dragged = event.target.id;
+            RefreshCardArea(_dragged);
+
+
+            var style = window.getComputedStyle(event.target, null);
+            offset_data = (parseInt(style.getPropertyValue("left"), 10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"), 10) - event.clientY);
+            event.dataTransfer.setData("text/plain", offset_data);
+        }
+        function drag_over(event) {
+
+            offset = event.dataTransfer.getData("text/plain").split
+            event.preventDefault();
+            return false;
+        }
+        function drop(event) {
+            offset = event.dataTransfer.getData("text/plain").split(',');
+            if (event.target.getAttribute("id") != null || event.target.getAttribute("id") != undefined) {
+
+                var ele = document.getElementsByName('card');
+                var _cardarea = "";
+                var pg = "";
+                for (i = 0; i < ele.length; i++) {
+                    if (ele[i].checked)
+                        _cardarea = ele[i].value;
+                }
+                if (_cardarea == "front") {
+                    pg = document.getElementById("cardfront");
+                }
+                else {
+                    pg = document.getElementById("cardback");
+                }
+                var offset = event.dataTransfer.getData("text/plain").split(',');
+
+                var dm = document.getElementById(_dragged);
+
+                if (event.clientX + parseInt(offset[0], 10) > 0 && event.clientY + parseInt(offset[1], 10) > 0
+                    &&
+                    event.clientX + parseInt(offset[0], 10) + parseInt(dm.style.width.replace('px', '')) <= parseInt(pg.style.width.replace('px', '')) &&
+                    event.clientY + parseInt(offset[1], 10) + parseInt(dm.style.height.replace('px', '')) <= parseInt(pg.style.height.replace('px', ''))
+                ) {
+
+                    dm.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
+                    dm.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
+
+                    var _hdnEle = document.getElementById('hdn-' + dm.getAttribute("id"));
+                    var _obj = JSON.parse(_hdnEle.value);
+
+                    if (_obj.iconImageId != "" && _obj.iconImageId != "0") {
+
+                        var imgEle = document.getElementById('img-' + dm.getAttribute("id"));
+
+                        if (imgEle != undefined) {
+                            if (_obj.iconImagePostiion == "R") {
+                                imgEle.style.left = parseInt(dm.style.left.replace('px', '')) + parseInt(dm.style.width.replace('px', '')) + 5 + 'px';
+                                imgEle.style.top = parseInt(dm.style.top.replace('px', '')) + 'px';
+                            }
+                            else {
+                                imgEle.style.left = parseInt(dm.style.left.replace('px', '')) - 25 + 'px';
+                                imgEle.style.top = parseInt(dm.style.top.replace('px', '')) + 'px';
+                            }
+                        }
+                    }
+
+                    document.getElementById("txtpositionx").value = (event.clientX + parseInt(offset[0], 10));
+                    document.getElementById("txtpositiony").value = (event.clientY + parseInt(offset[1], 10));
+
+                    _obj.PositionX = (event.clientX + parseInt(offset[0], 10));
+                    _obj.PositionY = (event.clientY + parseInt(offset[1], 10));
+                    _hdnEle.value = JSON.stringify(_obj);
+                }
+                else {
+                    alert("Element out of boundary is not allowed");
+                }
+            }
+            else {
+                alert("Element  out of boundary is not allowed");
+            }
+
+            event.preventDefault();
+            _dragged = "";
+            return false;
+        }
+
+    </script>
+    <script>
+        function SubmitButtonOnclick() {            
+            
+            var formData = new FormData();
+            var eleList = [];
+            var obj = document.getElementById("cardfront");
+
+            for (var i = 0; i < obj.children.length; i++) {
+                if (obj.children[i].type == "hidden") {
+                    var _eledetails = document.getElementById(obj.children[i].id);
+                    if (_eledetails != null) {
+                        eleList.push(_eledetails.value);
+                    }
+                }
+            }
+
+            var obj = document.getElementById("cardback");
+
+            for (i = 0; i < obj.children.length; i++) {
+                if (obj.children[i].type == "hidden") {
+                    var _eledetails = document.getElementById(obj.children[i].id);
+                    if (_eledetails != null) {
+                        eleList.push(_eledetails.value);
+                    }
+                }
+            }
+            var ele = document.getElementsByName('myRadios');
+
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked)
+                    var checkedvalue = parseInt(ele[i].value);
+                if (checkedvalue == 3) {
+                    $('#borderradius').val("999")
+                }
+
+            }
+          
+            formData.append("CardId", $('#hdnCardId').val());
+            formData.append("Cardname", $('#cardName').val());
+            formData.append("Borderradius", $('#borderradius').val());
+            formData.append("cardfront", $("#frontFile")[0].files[0]);
+            formData.append("cardback", $("#backFile")[0].files[0]);
+            formData.append("Cardfrontfile", $('#hdnFrontFile').val());
+            formData.append("Cardbackfile", $('#hdnBackFile').val());
+            formData.append("Cardshape", checkedvalue);
+            formData.append("Ispublished", $('#hdnIspublished').val());
+            formData.append("Category", document.getElementById("CardCategories").value);
+            formData.append("StrElements", eleList);
+            formData.append("IsDefault", $('#hdnIsDefaultCard').val());
+            formData.append("Statictext", $('#staticlabel').val());
+            formData.append("staticimage", $("#staticimage")[0].files[0]);
+            formData.append("staticimageFile", $("#staticimage").val());
+            formData.append("PickORCloneImg", $('#hdnpickorCloneImg').val());
+             
+
+            
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/api/card/SaveBusinessCard",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    alert("Saved Changes Successfully");                  
+                    CardID = data.cardId;
+                    window.location.replace(window.location.origin + "/BusinessCards/EditCard?cardId=" + CardID + "&PickORCloneImg="+false);
+
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+        // Save elemenet properties to database
+        function SaveElementData() {
+            var eleList = [];
+            var obj = document.getElementById("cardfront");
+
+            for (var i = 0; i < obj.children.length; i++) {
+                if (obj.children[i].type == "hidden") {
+                    var _eledetails = document.getElementById(obj.children[i].id);
+                    if (_eledetails != null) {
+                        eleList.push(_eledetails.value);
+                    }
+                }
+            }
+
+            var obj = document.getElementById("cardback");
+
+            for (i = 0; i < obj.children.length; i++) {
+                if (obj.children[i].type == "hidden") {
+                    var _eledetails = document.getElementById(obj.children[i].id);
+                    if (_eledetails != null) {
+                        eleList.push(_eledetails.value);
+                    }
+                }
+            }
+            var ele = document.getElementsByName('myRadios');
+
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked)
+                    var checkedvalue = parseInt(ele[i].value);
+                if (checkedvalue == 3) {
+                    $('#borderradius').val("999")
+                }
+
+            }
+            var _card = {
+                CardId: $('#hdnCardId').val(),
+                Cardname: $('#cardName').val(),
+                Borderradius: $('#borderradius').val(),
+                Cardfrontfile: $('#hdnFrontFile').val(),
+                Cardbackfile: $('#hdnBackFile').val(),
+                Cardshape: checkedvalue,
+                Ispublished: $('#hdnIspublished').val(),
+                Category: document.getElementById("CardCategories").value,
+                StrElements: eleList,
+                IsDefault: $('#hdnIsDefaultCard').val()
+            };
+            var formBody = [];
+            for (var key in _card) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(_card[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+
+            fetch('/api/Card/SaveBusinessCard', {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text())
+                .then((responseJson) => {
+                    alert("Saved Changes Successfully");
+                    var obj = JSON.parse(responseJson);
+                    CardID = obj.cardId;
+                    //(!obj.isBackImageExist || !obj.isFrontImageExist)
+                    
+                        SaveImagesIntoPhysicalPath();
+                   
+                    window.location.replace(window.location.origin + "/BusinessCards/EditCard?cardId=" + CardID);
+                })
+                .catch(error => console.log(error))
+            }
+
+        //create element objects with in the card
+        function createbuttonclick() {
+            var obj = document.getElementById("myElementGroup");
+            createobject(obj);
+        }
+        function deletebuttonclick() {
+
+            _ele = document.getElementsByClassName("focusElement");
+            if (_ele[0].textContent == "Static Label") {            
+                document.getElementById("STtext").style.visibility = "hidden";
+                document.getElementById("STinput").style.visibility = "hidden";
+
+            }
+            else if (_ele[0].textContent == "Static Image") {
+                document.getElementById("SItext").style.visibility = "hidden";
+                document.getElementById("SIfile").style.visibility = "hidden";
+            }
+            if (_ele.length == 0) {
+                alert("Please select an element to remove");
+            }
+            else {
+                if (confirm("Are you sure want to delete?")) {
+
+                    var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+                    var _obj = JSON.parse(_hdnEle.value);
+
+                    if (_obj.Id == "" || _obj.Id == "0") {
+                        removeDeletedElement(_hdnEle);
+                    }
+                    else {
+                        var dataToSend = {
+                            value: _obj.Id
+                        };
+                        var formBody = [];
+                        for (var key in dataToSend) {
+                            var encodedKey = encodeURIComponent(key);
+                            var encodedValue = encodeURIComponent(dataToSend[key]);
+                            formBody.push(encodedKey + "=" + encodedValue);
+                        }
+                        formBody = formBody.join("&");
+                        fetch('/api/Card/DeleteCardElementsData', {
+                            method: "POST",//Request Type
+                            body: formBody,//post body
+                            headers: {//Header Defination
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                            },
+                        }).then(response => response.text)
+                            .then((responseJson) => {
+                                removeDeletedElement(_hdnEle);
+                            })
+                            .catch(error => console.log(error))
+                    }
+                }
+                else {
+                    // txt = "You pressed Cancel!";
+                }
+            }
+        }
+
+        function removeDeletedElement(hdnEle) {
+            document.getElementById("POITable").style.visibility = "hidden";
+            document.getElementById("deletebtn").style.visibility = "hidden";
+
+            var _iconEle = document.getElementById('img-' + _ele[0].getAttribute("id"));
+
+            if (_iconEle != undefined)
+                _iconEle.remove();
+
+            hdnEle.remove();
+
+            _ele[0].remove();
+
+            alert("Succesfully deleted");
+        }
+
+        //create element objects with in the card
+        function createobject(obj) {
+
+            var ele = document.getElementsByName('card');
+            var _cardarea;
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked)
+                    _cardarea = ele[i].value;
+            }
+
+            if (obj.selectedIndex > 0) {
+
+                var _el = _cardarea + "_" + obj[obj.selectedIndex].text;
+                Generateobj(_cardarea, obj[obj.selectedIndex].value, obj[obj.selectedIndex].text, _el, "");
+            }
+            else {
+                alert("please select an element group to create or delete");
+            }
+            card = null;
+            _area = null;
+        }
+        function generateUniqueTag(value) {
+
+
+            var _hdnvalue = document.getElementById('hdn-' + value);
+            if (_hdnvalue == null) {
+                return value;
+            }
+            else {
+                for (var i = 1; i < 100; i++) {
+                    var _hdnvalue = document.getElementById('hdn-' + value + i);
+                    if (_hdnvalue == null) {
+
+                        return value + i;
+                        i = 101;
+
+                    }
+                    _hdnvalue = null;
+                }
+            }
+        }
+        function Generateobj(ea, egId, egName, value, jsonstring) {                      
+
+            var divcard = "";
+            if (ea == "F") {
+                divcard = document.getElementById("cardfront");
+            }
+            else if (ea == "B") {
+                divcard = document.getElementById("cardback");
+            }
+
+            value = generateUniqueTag(value);
+
+            if (jsonstring == "") {
+                var y = document.createElement("LABEL");
+                y.setAttribute("Id", value);
+                y.setAttribute("type", "label");
+                y.setAttribute("draggable", "true");
+                if (egId == "16" || egId =="99") {
+                    y.style.width = "100px";
+                    y.style.height = "100px";
+                }
+                else {
+                    y.style.width = "200px";
+                    y.style.height = "44px";
+                }
+                y.style.color = "white";
+
+                y.setAttribute("Class", "Celements");
+                y.setAttribute("divcardId", divcard.getAttribute("id"));
+                y.setAttribute("onclick", "BindDimensionstotable(event, this);");
+                y.setAttribute('iconImageId', "0");
+                y.setAttribute('iconImagePostiion', "0");
+                var t = document.createTextNode(egName);
+                y.appendChild(t);
+                divcard.appendChild(y);
+                var dm = document.getElementById(value);
+                dm.addEventListener('dragstart', drag_start, false);
+
+                var input = document.createElement("input");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("id", "hdn-" + value);
+                var _style = window.getComputedStyle(dm, null);
+                var obj = new Object();
+                obj["Id"] = 0;
+                obj["CardArea"] = ea;
+                obj["Width"] = dm.offsetWidth;
+                obj["Cardlementtagname"] = value;
+                obj["ElementgroupId"] = egId;
+                obj["Height"] = dm.offsetHeight;
+                obj["PositionX"] = dm.offsetLeft;
+                obj["PositionY"] = dm.offsetTop;
+                obj["FontSize"] = 13;
+                obj["FontColor"] = "#ffffff";
+                obj["FontWeight"] = _style.fontWeight;
+                obj["elementlineHeight"] = "20";
+                obj["iconImageId"] = "0";
+                obj["iconImagePostiion"] = "0";
+                obj["ElementTypeName"] = egName;
+
+                input.setAttribute("value", JSON.stringify(obj));
+                //append to form element that you want .
+                divcard.appendChild(input);
+            }
+        }
+
+        function BindDimensionstotable(event, obj) {
+            if (obj.textContent == "Static Label") {
+                document.getElementById("STtext").style.visibility = "visible";
+                document.getElementById("STinput").style.visibility = "visible";
+            }
+            else {
+                document.getElementById("STtext").style.visibility = "hidden";
+                document.getElementById("STinput").style.visibility = "hidden";
+            }
+            if (obj.textContent == "Static Image") {
+                document.getElementById("SItext").style.visibility = "visible";
+                document.getElementById("SIfile").style.visibility = "visible";
+            }
+            else {
+                document.getElementById("SItext").style.visibility = "hidden";
+                document.getElementById("SIfile").style.visibility = "hidden";
+            } 
+
+            document.getElementById("deletebtn").style.visibility = "visible";
+
+            document.getElementById("POITable").style.visibility = "visible";
+            RefreshCardArea(event.target.id);
+            // remove focus of previous selections
+            _ele = document.getElementsByClassName("focusElement");
+            for (var i = 0; i < _ele.length; i++) {
+                _ele[i].classList.remove("focusElement");
+            }
+            document.getElementById(event.target.id).classList.add("focusElement");
+
+            var _hdnvalue = document.getElementById('hdn-' + event.target.id);
+
+            var _obj = JSON.parse(_hdnvalue.value);
+            if (_hdnvalue != null) {
+                document.getElementById("txtcardelementname").value = _obj.ElementTypeName;
+                document.getElementById("txtpositionx").value = _obj.PositionX;
+                document.getElementById("txtpositiony").value = _obj.PositionY;
+                document.getElementById("txtheight").value = _obj.Height;
+                document.getElementById("txtwidth").value = _obj.Width;
+                document.getElementById("txtfontcolor").value = _obj.FontColor;
+                document.getElementById("txtfontsize").value = parseInt(_obj.FontSize);
+                document.getElementById("txtfontweight").value = _obj.FontWeight;
+                document.getElementById("txtlineHeight").value = _obj.elementlineHeight;
+                if (_obj.iconImagePostiion != "") {
+                    document.getElementById("txticonimageposition").value = _obj.iconImagePostiion;
+                }
+                else {
+                    document.getElementById("txticonimageposition").selectedIndex = 0;
+                }
+                if (_obj.iconImageId != "0") {
+                    document.getElementById("txticonimagehaslink").value = _obj.iconImageId;
+                }
+                else {
+                    document.getElementById("txticonimagehaslink").selectedIndex = 0;
+                }
+            }
+        }
+
+        function GetImageById(imageId) {
+
+            var selectedIcon = document.getElementById("txticonimagehaslink");
+
+            var iconFile = "";
+
+            for (var i = 0; i < selectedIcon.children.length; i++) {
+
+                if (selectedIcon.children[i].getAttribute("value") == imageId) {
+                    iconFile = selectedIcon.children[i].getAttribute("id");
+                }
+            }
+
+            var _iconEle = document.getElementById('img-' + _ele[0].getAttribute("id"));
+            var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+            var _hdnobj = JSON.parse(_hdnEle.value);
+
+            if (imageId == "0") { //Remove Icon
+                _iconEle.remove();
+                _hdnobj.iconImageId = 0;
+                _hdnobj.iconImagePostiion = "";
+                document.getElementById("txticonimageposition").value = "0";
+            }
+            else {
+                if (_iconEle == undefined) {
+
+                    var img = document.createElement("img");
+                    img.setAttribute("Id", "img-"+_ele[0].getAttribute("id"));
+                    img.style.top = parseInt(_hdnobj.PositionY) + 'px';
+                    img.style.width = "20px";
+                    img.style.height = parseInt(_hdnobj.Height) + "px";
+                    img.style.left = parseInt(_hdnobj.PositionX) - 25 + 'px';
+                    img.style.position = "absolute";
+                    img.src = "/uploadimgs/icons/" + iconFile;
+
+                    _hdnobj.iconImageId = imageId;
+                    _hdnobj.iconImagePostiion = "L";
+                    document.getElementById("txticonimageposition").value = "L";
+
+                    if (_hdnobj.CardArea == "F")
+                        document.getElementById("cardfront").appendChild(img);
+                    else
+                        document.getElementById("cardback").appendChild(img);
+                }
+                else {
+
+                    _iconEle.src = "/uploadimgs/icons/" + iconFile;
+                    _hdnobj.iconImageId = imageId;
+                }
+            }
+
+            _hdnEle.value = JSON.stringify(_hdnobj);
+        }
+
+        function iconposition(iconposition) {
+
+            var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+            var _obj = JSON.parse(_hdnEle.value);
+
+            if (_obj.iconImageId != "" && _obj.iconImageId != "0" && iconposition == "0") {
+
+                document.getElementById("txticonimageposition").value = _hdnobj.iconImagePostiion;
+
+                return;
+            }
+
+            var _iconEle = document.getElementById('img-' + _ele[0].getAttribute("id"));
+
+            if (iconposition == "L")
+                _iconEle.style.left = parseInt(_obj.PositionX) - 25 + 'px';
+            else
+                _iconEle.style.left = parseInt(_obj.PositionX) + parseInt(_obj.Width) + 5 + 'px';
+
+            _obj.iconImagePostiion = iconposition;
+
+            _hdnEle.value = JSON.stringify(_obj);
+        }
+
+        function CommonOnchange(event) {
+            if (event.id == 'borderradius') {
+                document.getElementById("cardfront").style.borderRadius = parseInt(document.getElementById("borderradius").value) + "px";
+                document.getElementById("cardback").style.borderRadius = parseInt(document.getElementById("borderradius").value) + "px";
+            }
+            else if (_ele != undefined) {
+                var focusEle = document.getElementById(_ele[0].getAttribute("id"));
+                var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+                var _obj = JSON.parse(_hdnEle.value);
+                switch (event.id) {
+                    case 'txtheight':
+
+                        _obj.Height = document.getElementById("txtheight").value;
+                        focusEle.style.height = _obj.Height + "px";
+                        break;
+                    case 'txtwidth':
+                        _obj.Width = document.getElementById("txtwidth").value;
+                        focusEle.style.width = _obj.Width + "px";
+                    case 'txtfontsize':
+                        _obj.FontSize = document.getElementById("txtfontsize").value;
+                        focusEle.style.fontSize = _obj.FontSize + "px";
+                        break;
+                    case 'txtfontweight':
+                        _obj.FontWeight = document.getElementById("txtfontweight").value;
+                        focusEle.style.fontWeight = _obj.FontWeight;
+                        break;
+                    case 'txthorizontal':
+                        // document.getElementById(_ele[0].getAttribute("id")).style.height = document.getElementById("txtheight").value + "px";
+                        break;
+                    case 'txtvertical':
+                        //  document.getElementById(_ele[0].getAttribute("id")).style.height = document.getElementById("txtheight").value + "px";
+                        break;
+                    case 'txtlineHeight':
+                        _obj.elementlineheight = document.getElementById("txtlineHeight").value;
+                        focusEle.style.lineHeight = _obj.elementlineheight + 'px';
+                        break;
+                    default:
+                        //Console.WriteLine("Invalid grade");
+                        break;
+                }
+                _hdnEle.value = JSON.stringify(_obj);
+            }
+        }
+        function FontcolorClickEvent(value) {
+
+            var focusEle = document.getElementById(_ele[0].getAttribute("id"));
+            var _hdnEle = document.getElementById('hdn-' + _ele[0].getAttribute("id"));
+            var _obj = JSON.parse(_hdnEle.value);
+            _obj.FontColor = value;
+            focusEle.style.color = value;
+            _hdnEle.value = JSON.stringify(_obj);
+
+        }
+        function CardTypeRadiobuttonTapped(myRadio) {
+
+
+            if (myRadio.value == "1") {
+                document.getElementById("borderRadiusCls").style.visibility = "visible";
+                document.getElementById("cardfront").style.height = "280px";
+                document.getElementById("cardfront").style.width = "494px";
+                document.getElementById("cardfront").style.borderRadius = "";
+                document.getElementById("borderradius").value = "0";
+                document.getElementById("cardback").style.height = "280px";
+                document.getElementById("cardback").style.width = "494px";
+                document.getElementById("cardback").style.borderRadius = "";
+            }
+            else if (myRadio.value == "2") {
+                document.getElementById("borderRadiusCls").style.visibility = "visible";
+                document.getElementById("cardfront").style.height = "494px";
+                document.getElementById("cardfront").style.width = "280px";
+                document.getElementById("cardfront").style.borderRadius = "";
+                document.getElementById("cardback").style.height = "494px";
+                document.getElementById("cardback").style.width = "280px";
+                document.getElementById("cardback").style.borderRadius = "";
+                document.getElementById("borderradius").value = "0";
+
+            }
+            else {
+                document.getElementById("borderRadiusCls").style.visibility = "hidden";
+                document.getElementById("cardfront").style.height = "290px";
+                document.getElementById("cardfront").style.width = "290px";
+                document.getElementById("cardfront").style.borderRadius = "50%";
+                document.getElementById("cardback").style.height = "290px";
+                document.getElementById("cardback").style.width = "290px";
+                document.getElementById("cardback").style.borderRadius = "50%";
+            }
+        }
+        function fileOnChange(file) {
+
+             //if (document.querySelector("input[type=file]") != null && document.querySelector("input[type=file]").files[0] != null) {
+
+                var input = event.target;
+            if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        if (file.id == "frontFile") {
+                          var divcardfront = document.querySelector('#cardfront');
+                          var FrontImagebase64data = e.target.result;
+                            document.getElementById("hdnFrontFile").value = input.files[0].name;
+                            divcardfront.style.backgroundImage = 'url(\'' + FrontImagebase64data + '\')';
+                        }
+                        else {
+                            var divcardback = document.querySelector('#cardback');
+                            var BackImagebase64data = e.target.result;
+                            document.getElementById("hdnBackFile").value = input.files[0].name;
+                            divcardback.style.backgroundImage = 'url(\'' + BackImagebase64data + '\')';
+                        }
+
+
+                    }
+                    reader.readAsDataURL(input.files[0]);
+            } else {
+                console.log("files not exist")
+            }
+
+    
+        }
+
+        window.onload = function () {
+            
+
+           var divcardfront = document.querySelector('#cardfront');
+
+                var ImageForfront = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.Cardfrontfile")';
+
+                divcardfront.style.backgroundImage = ImageForfront;
+
+                var divcardback = document.querySelector('#cardback');
+                var ImageforBack = 'url("' + window.location.origin + '/uploadimgs/cards/@Model.Cardbackfile")';
+
+            divcardback.style.backgroundImage = ImageforBack;
+
+           document.getElementById("CardCategories").value = @Model.Category;
+
+
+            $('.Celements').each(function () {
+                this.addEventListener('dragstart', drag_start, false);
+            });
+        };
+
+    </script>
+
+</body>
+</html>
+

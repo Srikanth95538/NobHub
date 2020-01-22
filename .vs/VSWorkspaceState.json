@@ -1,0 +1,17 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Prototype",
+    "\\Prototype\\NobHubWeb",
+    "\\Prototype\\NobHubWeb\\NobHub.BAL",
+    "\\Prototype\\NobHubWeb\\NobHub.BAL\\Models",
+    "\\Prototype\\NobHubWeb\\NobHub.DAL",
+    "\\Prototype\\NobHubWeb\\NobHub.DAL\\Models",
+    "\\Prototype\\NobHubWeb\\NobHubWeb",
+    "\\Prototype\\NobHubWeb\\NobHubWeb\\Controllers",
+    "\\Prototype\\NobHubWeb\\NobHubWeb\\Views",
+    "\\Prototype\\NobHubWeb\\NobHubWeb\\Views\\BusinessCards"
+  ],
+  "SelectedNode": "\\Prototype\\NobHubWeb\\NobHub.DAL\\Models\\Register3.cs",
+  "PreviewInSolutionExplorer": false
+}

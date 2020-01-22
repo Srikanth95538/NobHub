@@ -1,0 +1,56 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.RegisteredUsers>
+
+<div class="card">
+    <table class="table datatable-basic">
+        <thead>
+            <tr>
+                <th>Name/Contact</th>
+                <th>Company</th>
+                <th>Address</th>
+                <th>Referral</th>
+                <th>Image</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model)
+        {
+            <tbody>
+                <tr>
+                    <td>
+                        <div><span class="font-weight-semibold">Name: </span>@item.Name</div>
+                        <div><span class="font-weight-semibold">Mobile: </span>@item.Mobile</div>
+                        <div><span class="font-weight-semibold">Email: </span>@item.Email</div>
+                    </td>
+                    <td>
+                        <div><span class="font-weight-semibold">Company: </span>@item.Companyname</div>
+                        <div><span class="font-weight-semibold">Title: </span>@item.Title</div>
+                    </td>
+                    <td>
+                        <div>@item.Address</div>
+                    </td>
+                    <td>
+                        <div><span class="font-weight-semibold">Referral Code: </span>@item.Referalcode</div>
+                        <div><span class="font-weight-semibold">Referred by: </span>Jocks</div>
+                    </td>
+                    <td>
+                        <img class="img-fluid card-image" src="~/uploadimgs/cards/@item.CardFrontFile" alt="">
+                    </td>
+                    <td class="text-center">
+                        <div class="list-icons">
+                            <div class="dropdown">
+                                <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                    <i class="icon-menu9"></i>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a href="/BusinessCards/UserCardPreview?Guid=@item.Guid" class="dropdown-item">Preview</a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+</div>

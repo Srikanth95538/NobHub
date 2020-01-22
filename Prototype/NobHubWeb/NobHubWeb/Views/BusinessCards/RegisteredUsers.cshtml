@@ -1,0 +1,56 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.RegisteredUsers>
+@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1 = "Business Cards";
+}
+
+<div class="row">
+    <div class="col-lg-3 mb-1">
+     <input type="text" id="Filtertext" placeholder="Search.." class="form-control" />
+    </div>
+    <div class="col-lg-1">
+        <button onclick="UsersFilter();" class="btn btn-primary btn-sm">Search</button>
+    </div>
+        
+   
+</div>
+<div id="Userslist">
+    @Html.Partial("_UsersList", Model)
+</div>
+
+<script>
+    function UsersFilter() {
+        $("#Userslist").html("");
+          var value = document.getElementById("Filtertext").value;
+        var dataToSend = {
+            NameORMobilOREmail: value,
+            
+        };
+        var formBody = [];
+        for (var key in dataToSend) {
+            var encodedKey = encodeURIComponent(key);
+            var encodedValue = encodeURIComponent(dataToSend[key]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+          fetch(window.location.origin + "/BusinessCards/UsersFiltering", {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {  
+                $("#Userslist").html(responseJson);
+                if ($("#Userslist")[0].innerText == "") {
+                    alert("No matches found")
+            
+                }
+            })
+            .catch(error => console.log(error))
+
+    }
+</script>
+

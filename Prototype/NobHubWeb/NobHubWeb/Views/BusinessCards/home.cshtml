@@ -1,0 +1,20 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.BusinessCard>
+@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1 = "Business Cards";
+    var IsTemplate = false;
+   
+
+    var AllCardCategories = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.CardCategories>;
+}
+@using (Html.BeginForm("SearchTest", "Tests", FormMethod.Post, new { @id = "frmSrchTests", @class = "form-horizontal", @role = "form" }))
+{
+   
+}
+
+<script>
+
+
+</script>

@@ -1,0 +1,189 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.CardCategories>
+@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1 = "Business Cards";
+
+}
+<!DOCTYPE HTML>
+<html>
+<head>
+ </head>
+<body>
+    @Html.Hidden("hdnCategoryIdId", 0)
+    <div class="row mb-1 mt-1">
+        <div class="col-lg-10"></div>
+        <div class="col-lg-2 text-right">
+            <button class="btn btn-primary btn-sm"  onclick="AddCategory()">Add Category</button>
+        </div>
+
+    </div>
+    <div class="card">
+        <table class="table datatable-basic">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Image</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.categorieName</td>
+                        <td><img src="~/uploadimgs/categoryIcons/@item.Image" /></td>
+                        <td class="text-center">
+                            <div class="list-icons">
+                                <div class="dropdown">
+                                    <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                        <i class="icon-menu9"></i>
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a onclick="GetCategoryById(@item.categorieID)" class="dropdown-item">Edit</a>
+                                        <a onclick="DeleteCategory(@item.categorieID)" class="dropdown-item">delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+    <div class="modal" id="CategoryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label>Category Name</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="categoryname" style="width:250px" type="text" />
+                        </div>
+                        <div class="col-lg-3">
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-lg-3">
+                            <label>Category Icon</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="categoryfile" type="file" />
+                        </div>
+                        <div class="col-lg-3"></div>
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" onclick="createORUpdate()" class="btn btn-primary" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+
+                </div>
+        </div>
+
+    </div>
+</body>
+</html>
+    <script>
+        function AddCategory() {
+            $("#categoryname").val("");
+            $("#CategoryModal").modal("show");
+            $("#hdnCategoryIdId").val(0);
+        }
+        function GetCategoryById(categoryId) {
+            $("#hdnCategoryIdId").val(categoryId);
+            var formData = new FormData();
+
+            formData.append("categorieID", categoryId);
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/api/card/GetCategoryById",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    //  CardID = data.CategorieName;
+                    $("#CategoryModal .modal-title").html("Edit Category");
+                    $("#categoryname").val(data.categorieName);
+                    $("#CategoryModal").modal("show");
+
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+
+        function createORUpdate() {
+            debugger
+            $("#div_cardlist").html("");
+
+            var formData = new FormData();
+            formData.append("categorieID", $('#hdnCategoryIdId').val());
+            formData.append("categorieName", $('#categoryname').val());
+            formData.append("categoryfile", $('#categoryfile')[0].files[0])
+            formData.append("categoryFileName", $('#categoryfile')[0].files[0].name)
+
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/BusinessCards/createORUpdate",
+                data: formData,
+                dataType: 'html',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    $("#divpartial").html(data);
+                    $("#CategoryModal").modal("hide");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });      
+        }
+
+        function DeleteCategory(CategoryId) {
+            debugger
+            $("#div_cardlist").html("");
+            var dataToSend = {
+                categorieID: CategoryId,
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch(window.location.origin + "/BusinessCards/DeleteCategory", {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text())
+                .then((responseJson) => {
+                    $("#divpartial").html(responseJson);
+
+                })
+                .catch(error => console.log(error))
+
+        }
+   
+    </script>

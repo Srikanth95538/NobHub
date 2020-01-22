@@ -1,0 +1,103 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.BusinessCard>
+@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1 = "Business Cards";
+    var IsTemplate = false;
+    if (ViewBag.IsTemplate != null)
+    {
+        IsTemplate = true;
+    }
+
+    var AllCardCategories = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.CardCategories>;
+} 
+	<div class="mb-2">
+		<input type="hidden" class="hdnProdType" />
+		<div class="row">
+			<div class="col-xl-10 form-inline form-inline-custom" >
+				@*<form class="form-inline form-inline-custom">*@
+				@if (!IsTemplate)
+                {
+				<label class="mr-2">Card Categories: </label>
+                <div class="form-group">
+                   <select id="CardCategories" class="form-control" onchange="Filters()">
+                        <option value="0">Select</option>
+                        @foreach (var eleType in AllCardCategories)
+                        {
+                            <option value="@eleType.categorieID">@eleType.categorieName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="cardName" placeholder="Search.." class="form-control" />
+                </div>
+                <div class="form-group">
+                    <button onclick="Filters();" class="btn btn-primary btn-sm">Search</button>
+                </div>
+                }
+				@*</form>*@
+			</div>
+			<div class="col-xl-2 text-right">
+				@if (IsTemplate)
+                {
+                    <a href="@Url.Action("CreateCardTemplate", "BusinessCards")" class="btn btn-primary btn-sm">Create Card Template</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("create", "BusinessCards")" class="btn btn-primary btn-sm">Create New Card</a>
+                }
+			</div>
+		</div>			
+	</div>
+	
+
+    
+    <div id="div_cardlist">
+        @Html.Partial("_CardsList", Model)
+    </div>
+  
+
+<script>
+
+    function Filters() {
+        $("#div_cardlist").html("");
+        CategoryID = document.getElementById("CardCategories").value;
+        var CardName = document.getElementById("cardName").value;
+        var IscameFrom='@ViewBag.Title2';
+        
+        var dataToSend = {
+            Category: CategoryID,
+            Cardname: CardName,
+            IscameFrom: IscameFrom
+        };
+        var formBody = [];
+        for (var key in dataToSend) {
+            var encodedKey = encodeURIComponent(key);
+            var encodedValue = encodeURIComponent(dataToSend[key]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");
+        fetch(window.location.origin + "/BusinessCards/CardsFiltering", {
+            method: "POST",//Request Type
+            body: formBody,//post body
+            headers: {//Header Defination
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+        }).then(response => response.text())
+            .then((responseJson) => {  
+                $("#div_cardlist").html(responseJson);
+                if ($("#div_cardlist")[0].innerText == "") {
+                    alert("No results found")
+                   
+                   
+                   // $("#div_cardlist")[0].innerText = '<h1>No matches found.."
+                }
+            })
+            .catch(error => console.log(error))
+
+    }
+
+   
+
+</script>

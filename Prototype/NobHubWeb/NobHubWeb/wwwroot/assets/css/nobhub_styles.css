@@ -1,0 +1,75 @@
+.sidebar-dark, .navbar-dark {
+    background-color: #029fae;
+}
+    /*.sidebar-dark .nav-sidebar .nav-link:not(.disabled):hover, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar .nav-link:not(.disabled):hover {
+        background-color: #592404;
+    }*/
+    .sidebar-dark .sidebar-mobile-toggler:not([class*=bg-]) {
+        background-color: #502e13;
+    }
+.navbar-brand img {
+    height: auto;
+}
+.navbar-brand {
+    padding-top: .2375rem;
+    padding-bottom: .2375rem;
+    margin-right: 0;
+}
+.navbar-text {
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+}
+/*.navbar-light .navbar-nav-link:focus, .navbar-light .navbar-nav-link:hover {
+    color: #fff;
+    background-color: rgb(89, 36, 4);
+}*/
+.sidebar {
+    width: 14rem;
+}
+.nav-sidebar .nav-item:not(.nav-item-header):first-child {
+    padding-top: 0px;
+}
+.sidebar-dark .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar-dark .nav-sidebar > .nav-item > .nav-link.active, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: #592404;    
+}
+.page-title h4 > span {
+    color: #592404;
+}
+.form-inline-custom label, .form-inline-custom .form-group {
+    margin-right: .625rem;
+}
+.form-inline-custom label {
+    font-weight: 500;
+}
+#div_cardlist .dropdown-menu {
+    min-width: 8.25rem;
+}
+.btn-primary {
+    background-color: #049eae;
+}
+    .btn-primary:hover {
+        background-color: #098694;
+        border-color: #098694;
+    }
+    .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+        background-color: #098694;
+        border-color: #098694;
+    }
+.card-image {
+    height: 50px;
+    border: 1px solid #b7b7b7;
+    padding: 1px;
+}
+.register-users .dropdown-menu {
+    min-width: 7.25rem;
+}
+
+    @media (min-width: 768px) {
+        .navbar-expand-md .navbar-brand {
+            min-width: 12.725rem;
+        }
+
+        .sidebar-expand-md:not(.sidebar-component) {
+            transition: all 0.4s;
+        }
+    }

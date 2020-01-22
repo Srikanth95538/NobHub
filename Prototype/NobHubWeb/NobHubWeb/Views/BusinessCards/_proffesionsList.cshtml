@@ -1,0 +1,189 @@
+﻿@model IEnumerable<NobHub.BAL.Models.Professions>
+
+<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+    @Html.Hidden("ProffessionId", 0)
+    <div class="row mb-1 mt-1">
+        <div class="col-lg-10"></div>
+        <div class="col-lg-2 text-right">
+            <button class="btn btn-primary btn-sm" data-toggle="modal" onclick="AddProffesion()">Add Profession</button>
+        </div>
+
+    </div>
+    <div class="card">
+        <table class="table datatable-basic">
+            <thead>
+                <tr>
+                    <th>Professions</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.Name</td>
+                        <td class="text-center">
+                            <div class="list-icons">
+                                <div class="dropdown">
+                                    <a href="#" class="list-icons-item" data-toggle="dropdown">
+                                        <i class="icon-menu9"></i>
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a onclick="GetProffesionById(@item.Id)" class="dropdown-item">Edit</a>
+                                        <a onclick="DeleteProffesion(@item.Id)" class="dropdown-item">delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+
+    <div class="modal" id="ProffesionsModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <label>Profeesion Name</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input id="proffesionname" style="width:250px" type="text" />
+                        </div>
+                        <div class="col-lg-3">
+
+                        </div>
+                      
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" onclick="createORUpdateProffesion()" class="btn btn-primary" data-dismiss="modal">Save</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    </body>
+</html>
+    <script>
+        function AddProffesion() {
+            $("#proffesionname").val("");
+            $("#ProffesionsModal").modal("show");
+            $("#ProffessionId").val(0);
+        }
+        function GetProffesionById(ProffeId) {
+            
+            $("#ProffessionId").val(ProffeId);
+            var formData = new FormData();
+
+            formData.append("Guid", ProffeId);
+            $.ajax({
+                type: "POST",
+                url: window.location.origin + "/api/card/GetProffesionById",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    //  CardID = data.CategorieName;
+                    $("#ProffesionsModal .modal-title").html("Edit Proffesion");
+                    $("#proffesionname").val(data.name);
+                    $("#ProffesionsModal").modal("show");
+
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+        function createORUpdateProffesion() {
+            debugger
+            $("#div_cardlist").html("");
+            var dataToSend = {
+                Id: $('#ProffessionId').val(),
+                Name: $('#proffesionname').val(),
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch(window.location.origin + "/BusinessCards/createORUpdateProffesion", {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text())
+                .then((responseJson) => {
+                    $("#divpartial").html(responseJson);
+
+                })
+                .catch(error => console.log(error))
+
+        }
+        function DeleteProffesion(ProfId) {
+            $("#div_cardlist").html("");
+            var dataToSend = {
+                Id: ProfId,
+            };
+            var formBody = [];
+            for (var key in dataToSend) {
+                var encodedKey = encodeURIComponent(key);
+                var encodedValue = encodeURIComponent(dataToSend[key]);
+                formBody.push(encodedKey + "=" + encodedValue);
+            }
+            formBody = formBody.join("&");
+            fetch(window.location.origin + "/BusinessCards/DeleteProffesion", {
+                method: "POST",//Request Type
+                body: formBody,//post body
+                headers: {//Header Defination
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+            }).then(response => response.text())
+                .then((responseJson) => {
+                    $("#divpartial").html(responseJson);
+
+                })
+                .catch(error => console.log(error))
+
+            //var formData = new FormData();
+            //formData.append("Id", ProfId);
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: window.location.origin + "/api/card/DeleteProffesion",
+            //    data: formData,
+            //    dataType: 'json',
+            //    contentType: false,
+            //    processData: false,
+            //    success: function (data) {
+
+
+            //    },
+            //    error: function (error) {
+
+            //    }
+            //});
+        }
+    </script>

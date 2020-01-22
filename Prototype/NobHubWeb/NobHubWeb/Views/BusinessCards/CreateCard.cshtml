@@ -1,0 +1,73 @@
+﻿
+@model IEnumerable<NobHub.BAL.Models.BusinessCard>
+@{
+
+    ViewBag.Title = "Tests";
+    ViewBag.Title1= "Business Cards";
+    ViewBag.Title2 = " - Create New Card";
+    var AllCardCategories = ViewBag.AllCategories as IEnumerable<NobHub.BAL.Models.CardCategories>;
+    var _cardHeight = 150;
+    var _cardWidth = 240;
+}
+
+@using (Html.BeginForm("SearchTest", "Tests", FormMethod.Post, new { @id = "frmSrchTests", @class = "form-inline", @role = "form" }))
+{
+    <div class="mb-2">
+        <input type="hidden" class="hdnProdType" />
+        <div class="row">
+			<div class="col-xl-2 text-right">
+            </div>
+            <div class="col-xl-10">
+                <a href="@Url.Action("CreateCard", "BusinessCards")" class="btn btn-primary btn-sm">Create New Card</a>
+
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            if (item.Cardshape == 1)
+            {
+                _cardHeight = 150;
+                _cardWidth = 240;
+            }
+            else if (item.Cardshape == 2)
+            {
+                _cardHeight = 240;
+                _cardWidth = 150;
+            }
+            else if (item.Cardshape == 3)
+            {
+                _cardHeight = 150;
+                _cardWidth = 150;
+
+            }
+            <div class="col-lg-6">
+
+                <div class="card card-body border-top-info">
+                    <div class="row mb-2">
+                        <div class="col-lg-10">
+                            Name: <b>@item.Cardname</b> <br />                           
+                        </div>
+                        <div class="col-lg-2">
+                            <a href="@Url.Action("CreateCard", "BusinessCards",new { basecard=item.CardId,PickORCloneImg=true })" class="btn btn-primary btn-sm">Pick</a>
+                        </div>                    
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <img class="img-fluid" src="~/uploadimgs/cards/@item.Cardfrontfile" style="height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(item.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;" class="img-fluid"/>
+                        </div>
+                        <div class="col-lg-6">
+                            <img class="img-fluid" src="~/uploadimgs/cards/@item.Cardbackfile" style="height:@(_cardHeight + "px;") width:@(_cardWidth + "px;") border-radius:@(item.Borderradius + "px;") background-size: contain;background-repeat: no-repeat;" class="img-fluid" />
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    </div>
+}
